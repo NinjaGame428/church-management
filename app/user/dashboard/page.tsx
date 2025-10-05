@@ -236,9 +236,11 @@ export default function UserDashboard() {
                   <p className="text-sm text-yellow-700">Indisponible mercredi 25 octobre</p>
                 </div>
 
-                <Button className="w-full">
-                  <Calendar className="h-4 w-4 mr-2" />
-                  Mettre à jour ma disponibilité
+                <Button className="w-full" asChild>
+                  <Link href="/user/availability">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    Mettre à jour ma disponibilité
+                  </Link>
                 </Button>
               </div>
             </CardContent>

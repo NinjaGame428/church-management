@@ -25,6 +25,8 @@ model User {
   availability Availability[]
   services     ServiceAssignment[]
   church       Church?             @relation(fields: [churchId], references: [id])
+  swapRequestsFrom SwapRequest[]   @relation("SwapRequestFrom")
+  swapRequestsTo   SwapRequest[]   @relation("SwapRequestTo")
 
   @@map("users")
 }
@@ -54,6 +56,7 @@ model Service {
   updatedAt   DateTime            @updatedAt
   assignments ServiceAssignment[]
   church      Church              @relation(fields: [churchId], references: [id])
+  swapRequests SwapRequest[]
 
   @@map("services")
 }
@@ -107,4 +110,23 @@ enum AvailabilityStatus {
   AVAILABLE
   UNAVAILABLE
   BUSY
+}
+
+model SwapRequest {
+  id          String   @id @default(cuid())
+  fromUserId  String
+  toUserId    String
+  serviceId   String
+  date        DateTime
+  message     String?
+  status      String   @default("pending") // pending, accepted, rejected
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  fromUser User    @relation("SwapRequestFrom", fields: [fromUserId], references: [id])
+  toUser   User    @relation("SwapRequestTo", fields: [toUserId], references: [id])
+  service  Service @relation(fields: [serviceId], references: [id])
+
+  @@map("swap_requests")
 }
