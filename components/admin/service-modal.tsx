@@ -57,13 +57,21 @@ interface ServiceModalProps {
   onClose: () => void;
   onSave: (service: ServiceFormData) => Promise<void>;
   service?: Service | null;
+  currentUser?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    role: string;
+  };
 }
 
 export default function ServiceModal({ 
   isOpen, 
   onClose, 
   onSave, 
-  service
+  service,
+  currentUser
 }: ServiceModalProps) {
   const [formData, setFormData] = useState({
     title: '',
@@ -194,11 +202,43 @@ export default function ServiceModal({
 
   const getAvailableUsers = () => {
     const assignedUserIds = assignments.map(assignment => assignment.userId);
-    return users.filter(user => !assignedUserIds.includes(user.id));
+    const availableUsers = users.filter(user => !assignedUserIds.includes(user.id));
+    
+    // Add current admin user if not already in the list and not assigned
+    if (currentUser && !assignedUserIds.includes(currentUser.id)) {
+      const adminInList = availableUsers.find(user => user.id === currentUser.id);
+      if (!adminInList) {
+        availableUsers.unshift({
+          id: currentUser.id,
+          firstName: currentUser.firstName,
+          lastName: currentUser.lastName,
+          email: currentUser.email,
+          department: 'Administration',
+          role: currentUser.role
+        });
+      }
+    }
+    
+    return availableUsers;
   };
 
   const getAssignedUser = (userId: string) => {
-    return users.find(user => user.id === userId);
+    const user = users.find(user => user.id === userId);
+    if (user) return user;
+    
+    // Check if it's the current admin user
+    if (currentUser && currentUser.id === userId) {
+      return {
+        id: currentUser.id,
+        firstName: currentUser.firstName,
+        lastName: currentUser.lastName,
+        email: currentUser.email,
+        department: 'Administration',
+        role: currentUser.role
+      };
+    }
+    
+    return null;
   };
 
   if (!isOpen) return null;
@@ -322,7 +362,19 @@ export default function ServiceModal({
                     <SelectContent>
                       {getAvailableUsers().map((user) => (
                         <SelectItem key={user.id} value={user.id}>
-                          {user.firstName} {user.lastName} ({user.email})
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">
+                              {user.firstName} {user.lastName}
+                            </span>
+                            {currentUser && user.id === currentUser.id && (
+                              <Badge variant="outline" className="text-xs">
+                                Vous
+                              </Badge>
+                            )}
+                            <span className="text-muted-foreground">
+                              ({user.email})
+                            </span>
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -383,6 +435,11 @@ export default function ServiceModal({
                                 <span className="font-medium">
                                   {user ? `${user.firstName} ${user.lastName}` : 'Utilisateur inconnu'}
                                 </span>
+                                {currentUser && assignment.userId === currentUser.id && (
+                                  <Badge variant="outline" className="text-xs">
+                                    Vous
+                                  </Badge>
+                                )}
                                 <Badge 
                                   variant="secondary" 
                                   className="text-xs"

@@ -315,6 +315,11 @@ export default function AdminServices() {
                                 <span className="text-sm font-medium">
                                   {assignment.user.firstName} {assignment.user.lastName}
                                 </span>
+                                {user && assignment.user.id === user.id && (
+                                  <Badge variant="outline" className="text-xs ml-1">
+                                    Vous
+                                  </Badge>
+                                )}
                               </div>
                               <span className="text-xs text-muted-foreground">({assignment.role})</span>
                             </div>
@@ -375,6 +380,7 @@ export default function AdminServices() {
         }}
         onSave={handleSaveService}
         service={editingService}
+        currentUser={user}
       />
     </DashboardLayout>
   );
