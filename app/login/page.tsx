@@ -7,21 +7,42 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Eye, EyeOff, Mail, Lock } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import React, { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const { login, user, isLoading } = useAuth();
+  const router = useRouter();
+
+  // Redirect if already logged in
+  React.useEffect(() => {
+    if (user) {
+      if (user.role === 'admin') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/user/dashboard');
+      }
+    }
+  }, [user, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setError('');
     
-    // Simulate login process
-    setTimeout(() => {
-      setIsLoading(false);
-      // Handle login logic here
-    }, 1000);
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    
+    const success = await login(email, password);
+    
+    if (success) {
+      // Redirect will happen automatically via useEffect
+    } else {
+      setError('Email ou mot de passe incorrect');
+    }
   };
 
   return (
@@ -60,6 +81,11 @@ export default function LoginPage() {
           </CardHeader>
           
           <CardContent>
+            {error && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-600">{error}</p>
+              </div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>

@@ -2,6 +2,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Geist } from "next/font/google";
+import { AuthProvider } from "@/contexts/AuthContext";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -9,24 +10,22 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "PureLanding - Beautiful Shadcn UI Landing Page",
+  title: "ChurchManager - Gestion Intelligente des Services d'Église",
   description:
-    "A beautiful landing page built with Shadcn UI, Next.js 15, Tailwind CSS, and Shadcn UI Blocks.",
+    "Simplifiez la planification de vos services avec notre plateforme complète. Gérez les intervenants, planifiez les services et coordonnez votre équipe en toute simplicité.",
   keywords: [
-    "PureLanding",
-    "PureLanding Landing Page",
-    "PureLanding Landing Page Template",
-    "PureLanding Page",
-    "Shadcn UI Landing Page",
-    "Shadcn UI Blocks",
-    "Shadcn UI",
-    "Landing Page",
-    "Tailwind CSS Landing Page",
-    "Beautiful Shadcn UI Landing Page",
-    "Next.js 15 Landing Page",
-    "Simple Landing Page",
-    "Landing Page Template",
-    "Landing Page Design",
+    "ChurchManager",
+    "Gestion Église",
+    "Services Église",
+    "Planification Services",
+    "Intervenants Église",
+    "Calendrier Église",
+    "Organisation Église",
+    "Gestion Intervenants",
+    "Planning Services",
+    "Église Digitale",
+    "Outils Église",
+    "Administration Église",
   ],
   openGraph: {
     type: "website",
@@ -102,7 +101,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TooltipProvider>{children}</TooltipProvider>
+          <AuthProvider>
+            <TooltipProvider>{children}</TooltipProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
