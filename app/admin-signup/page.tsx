@@ -4,18 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, Building, Phone } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function SignupPage() {
+export default function AdminSignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  // All users are USER by default - no role selection needed
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,7 +26,9 @@ export default function SignupPage() {
       firstName: formData.get('firstName') as string,
       lastName: formData.get('lastName') as string,
       phone: formData.get('phone') as string,
-      role: 'USER', // All users are USER by default
+      role: 'ADMIN', // Admin registration
+      churchName: formData.get('churchName') as string,
+      churchAddress: formData.get('churchAddress') as string,
     };
 
     try {
@@ -43,7 +42,7 @@ export default function SignupPage() {
 
       if (response.ok) {
         // Registration successful, redirect to login
-        router.push('/login?message=Registration successful');
+        router.push('/login?message=Admin registration successful');
       } else {
         const error = await response.json();
         alert(error.error || 'Registration failed');
@@ -68,37 +67,22 @@ export default function SignupPage() {
           Retour à l'accueil
         </Link>
 
-        <Card className="shadow-lg">
+        <Card>
           <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-primary rounded-lg flex items-center justify-center mb-4">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-primary-foreground"
-              >
-                <path
-                  d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z"
-                  fill="currentColor"
-                />
-              </svg>
-            </div>
-            <CardTitle className="text-2xl">Créer un compte</CardTitle>
+            <CardTitle className="text-2xl font-bold">Inscription Administrateur</CardTitle>
             <CardDescription>
-              Rejoignez ChurchManager et simplifiez la gestion de vos services
+              Créez un compte administrateur pour gérer votre église
             </CardDescription>
           </CardHeader>
           
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* User Type Selection */}
+              {/* Admin Notice */}
               <div className="space-y-2">
                 <Label>Type de compte</Label>
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
-                  <p className="text-sm text-blue-800">
-                    <strong>Intervenant</strong> - Vous serez enregistré comme participant aux services
+                <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                  <p className="text-sm text-red-800">
+                    <strong>Administrateur d'Église</strong> - Accès complet à la gestion des services
                   </p>
                 </div>
               </div>
@@ -135,7 +119,30 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              {/* Church Information - Not needed for regular users */}
+              {/* Church Information */}
+              <div className="space-y-2">
+                <Label htmlFor="churchName">Nom de l'église *</Label>
+                <div className="relative">
+                  <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="churchName"
+                    name="churchName"
+                    type="text"
+                    placeholder="Église de la Paix"
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="churchAddress">Adresse de l'église</Label>
+                <Input
+                  id="churchAddress"
+                  name="churchAddress"
+                  type="text"
+                  placeholder="123 Rue de la Paix, 75001 Paris"
+                />
+              </div>
 
               {/* Contact Information */}
               <div className="space-y-2">
@@ -224,60 +231,29 @@ export default function SignupPage() {
                 </div>
               </div>
 
-              {/* Terms and Conditions */}
-              <div className="flex items-start space-x-2">
-                <input
-                  id="terms"
-                  type="checkbox"
-                  className="rounded border-gray-300 mt-1"
-                  required
-                />
-                <Label htmlFor="terms" className="text-sm leading-relaxed">
-                  J'accepte les{" "}
-                  <Link href="/terms" className="text-primary hover:underline">
-                    conditions d'utilisation
-                  </Link>{" "}
-                  et la{" "}
-                  <Link href="/privacy" className="text-primary hover:underline">
-                    politique de confidentialité
-                  </Link>
-                </Label>
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Création du compte..." : "Créer mon compte"}
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={isLoading}
+              >
+                {isLoading ? "Création du compte..." : "Créer le compte administrateur"}
               </Button>
             </form>
 
-            <Separator className="my-6" />
-
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">
+            <div className="mt-6 text-center text-sm">
+              <p className="text-muted-foreground">
                 Déjà un compte ?{" "}
                 <Link href="/login" className="text-primary hover:underline">
                   Se connecter
                 </Link>
               </p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Inscription pour administrateur d'église ?{" "}
-                <Link href="/admin-signup" className="text-primary hover:underline">
-                  Inscription Admin
+              <p className="text-muted-foreground mt-2">
+                Inscription pour intervenants ?{" "}
+                <Link href="/signup" className="text-primary hover:underline">
+                  Inscription Intervenant
                 </Link>
               </p>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Benefits */}
-        <Card className="mt-4 bg-green-50 border-green-200">
-          <CardContent className="pt-4">
-            <h4 className="font-medium text-sm text-green-900 mb-2">Avantages de ChurchManager</h4>
-            <ul className="space-y-1 text-xs text-green-700">
-              <li>• Planification simplifiée des services</li>
-              <li>• Gestion des intervenants en temps réel</li>
-              <li>• Interface mobile optimisée</li>
-              <li>• Notifications automatiques</li>
-            </ul>
           </CardContent>
         </Card>
       </div>

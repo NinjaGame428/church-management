@@ -19,6 +19,9 @@ const Navbar = () => {
           <Button variant="outline" className="hidden sm:inline-flex" asChild>
             <Link href="/login">Connexion</Link>
           </Button>
+          <Button variant="outline" className="hidden sm:inline-flex" asChild>
+            <Link href="/admin-signup">Admin</Link>
+          </Button>
           <Button className="hidden xs:inline-flex" asChild>
             <Link href="/signup">Commencer</Link>
           </Button>
