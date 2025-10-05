@@ -52,6 +52,8 @@ export default function AdminRoles() {
       const response = await fetch('/api/admin/roles');
       if (response.ok) {
         const data = await response.json();
+        console.log('Roles loaded in admin page:', data.length, 'roles');
+        console.log('Role names in admin page:', data.map(r => r.name));
         setRoles(data);
       } else {
         setError('Erreur lors du chargement des rôles');
