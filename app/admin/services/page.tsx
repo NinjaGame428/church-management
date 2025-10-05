@@ -46,6 +46,17 @@ interface Service {
   };
 }
 
+interface ServiceFormData {
+  id?: string;
+  title: string;
+  description?: string;
+  date: string;
+  time: string;
+  location: string;
+  status: 'DRAFT' | 'PUBLISHED' | 'CANCELLED';
+  assignments?: { userId: string; role: string }[];
+}
+
 export default function AdminServices() {
   const [services, setServices] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -130,7 +141,7 @@ export default function AdminServices() {
     setShowModal(true);
   };
 
-  const handleSaveService = async (serviceData: Partial<Service>) => {
+  const handleSaveService = async (serviceData: ServiceFormData) => {
     try {
       const url = editingService 
         ? `/api/admin/services/${editingService.id}`

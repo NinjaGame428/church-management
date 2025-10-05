@@ -6,35 +6,98 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const { status } = await request.json()
+    const requestData = await request.json();
+    const { 
+      title,
+      description,
+      date,
+      time,
+      location,
+      status,
+      assignments = []
+    } = requestData;
 
-    const service = await prisma.service.update({
-      where: { id: params.id },
-      data: { status: status as 'DRAFT' | 'PUBLISHED' | 'CANCELLED' },
-      include: {
-        assignments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                firstName: true,
-                lastName: true
+    // If only status is provided, just update status
+    if (status && Object.keys(requestData).length === 1) {
+      const service = await prisma.service.update({
+        where: { id: params.id },
+        data: { status: status as 'DRAFT' | 'PUBLISHED' | 'CANCELLED' },
+        include: {
+          assignments: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true
+                }
               }
             }
-          }
-        },
-        church: {
-          select: {
-            id: true,
-            name: true
+          },
+          church: {
+            select: {
+              id: true,
+              name: true
+            }
           }
         }
-      }
+      })
+
+      return NextResponse.json(service)
+    }
+
+    // Full service update
+    const service = await prisma.$transaction(async (tx) => {
+      // Delete existing assignments
+      await tx.serviceAssignment.deleteMany({
+        where: { serviceId: params.id }
+      })
+
+      // Update service
+      const updatedService = await tx.service.update({
+        where: { id: params.id },
+        data: {
+          title,
+          description,
+          date: new Date(date),
+          time,
+          location,
+          status: status as 'DRAFT' | 'PUBLISHED' | 'CANCELLED',
+          assignments: {
+            create: assignments.map((assignment: { userId: string; role: string }) => ({
+              userId: assignment.userId,
+              role: assignment.role,
+              status: 'PENDING'
+            }))
+          }
+        },
+        include: {
+          assignments: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true
+                }
+              }
+            }
+          },
+          church: {
+            select: {
+              id: true,
+              name: true
+            }
+          }
+        }
+      })
+
+      return updatedService
     })
 
     return NextResponse.json(service)
   } catch (error) {
-    console.error('Update service status error:', error)
+    console.error('Update service error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

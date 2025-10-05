@@ -44,7 +44,8 @@ export async function POST(request: NextRequest) {
       date,
       time,
       location,
-      status = 'DRAFT'
+      status = 'DRAFT',
+      assignments = []
     } = await request.json()
 
     if (!title || !date || !time || !location) {
@@ -71,13 +72,31 @@ export async function POST(request: NextRequest) {
         time,
         location,
         status: status as 'DRAFT' | 'PUBLISHED' | 'CANCELLED',
-        churchId: church.id
+        churchId: church.id,
+        assignments: {
+          create: assignments.map((assignment: { userId: string; role: string }) => ({
+            userId: assignment.userId,
+            role: assignment.role,
+            status: 'PENDING'
+          }))
+        }
       },
       include: {
         church: {
           select: {
             id: true,
             name: true
+          }
+        },
+        assignments: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true
+              }
+            }
           }
         }
       }

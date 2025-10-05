@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { X, Save } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { X, Save, Plus, Trash2, User, Users } from "lucide-react";
 
 interface Service {
   id: string;
@@ -18,6 +19,21 @@ interface Service {
   location: string;
   status: 'DRAFT' | 'PUBLISHED' | 'CANCELLED';
   churchId?: string;
+  assignments?: any[];
+}
+
+interface User {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  department?: string;
+  role: string;
+}
+
+interface UserAssignment {
+  userId: string;
+  role: string;
 }
 
 interface Church {
@@ -25,10 +41,21 @@ interface Church {
   name: string;
 }
 
+interface ServiceFormData {
+  id?: string;
+  title: string;
+  description?: string;
+  date: string;
+  time: string;
+  location: string;
+  status: 'DRAFT' | 'PUBLISHED' | 'CANCELLED';
+  assignments?: { userId: string; role: string }[];
+}
+
 interface ServiceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (service: Partial<Service>) => Promise<void>;
+  onSave: (service: ServiceFormData) => Promise<void>;
   service?: Service | null;
 }
 
@@ -46,6 +73,12 @@ export default function ServiceModal({
     location: '',
     status: 'DRAFT' as 'DRAFT' | 'PUBLISHED' | 'CANCELLED'
   });
+  const [users, setUsers] = useState<User[]>([]);
+  const [assignments, setAssignments] = useState<UserAssignment[]>([]);
+  const [newAssignment, setNewAssignment] = useState({
+    userId: '',
+    role: ''
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -59,6 +92,13 @@ export default function ServiceModal({
         location: service.location,
         status: service.status
       });
+      // Convert existing assignments to the new format
+      if (service.assignments) {
+        setAssignments(service.assignments.map((assignment: any) => ({
+          userId: assignment.user.id,
+          role: assignment.role
+        })));
+      }
     } else {
       setFormData({
         title: '',
@@ -68,8 +108,28 @@ export default function ServiceModal({
         location: '',
         status: 'DRAFT'
       });
+      setAssignments([]);
     }
   }, [service]);
+
+  // Load users when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      loadUsers();
+    }
+  }, [isOpen]);
+
+  const loadUsers = async () => {
+    try {
+      const response = await fetch('/api/admin/users');
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data);
+      }
+    } catch (error) {
+      console.error('Error loading users:', error);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +137,10 @@ export default function ServiceModal({
     setIsLoading(true);
 
     try {
-      await onSave(formData);
+      await onSave({
+        ...formData,
+        assignments
+      } as ServiceFormData);
       onClose();
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Erreur lors de la sauvegarde');
@@ -91,6 +154,34 @@ export default function ServiceModal({
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleAddAssignment = () => {
+    if (newAssignment.userId && newAssignment.role) {
+      // Check if user is already assigned
+      const isAlreadyAssigned = assignments.some(assignment => assignment.userId === newAssignment.userId);
+      if (isAlreadyAssigned) {
+        setError('Cet utilisateur est déjà assigné à ce service');
+        return;
+      }
+
+      setAssignments(prev => [...prev, { ...newAssignment }]);
+      setNewAssignment({ userId: '', role: '' });
+      setError('');
+    }
+  };
+
+  const handleRemoveAssignment = (userId: string) => {
+    setAssignments(prev => prev.filter(assignment => assignment.userId !== userId));
+  };
+
+  const getAvailableUsers = () => {
+    const assignedUserIds = assignments.map(assignment => assignment.userId);
+    return users.filter(user => !assignedUserIds.includes(user.id));
+  };
+
+  const getAssignedUser = (userId: string) => {
+    return users.find(user => user.id === userId);
   };
 
   if (!isOpen) return null;
@@ -191,6 +282,105 @@ export default function ServiceModal({
                 placeholder="Ex: Salle principale, Église Saint-Pierre"
                 required
               />
+            </div>
+
+            {/* User Assignments Section */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                <Label className="text-base font-medium">Assignation des intervenants</Label>
+              </div>
+
+              {/* Add New Assignment */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                <div className="space-y-2">
+                  <Label htmlFor="userSelect">Sélectionner un utilisateur</Label>
+                  <Select 
+                    value={newAssignment.userId} 
+                    onValueChange={(value) => setNewAssignment(prev => ({ ...prev, userId: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choisir un utilisateur" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {getAvailableUsers().map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.firstName} {user.lastName} ({user.email})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="roleSelect">Rôle</Label>
+                  <Select 
+                    value={newAssignment.role} 
+                    onValueChange={(value) => setNewAssignment(prev => ({ ...prev, role: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choisir un rôle" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Prédicateur">Prédicateur</SelectItem>
+                      <SelectItem value="Musicien">Musicien</SelectItem>
+                      <SelectItem value="Chantre">Chantre</SelectItem>
+                      <SelectItem value="Accueil">Accueil</SelectItem>
+                      <SelectItem value="Technique">Technique</SelectItem>
+                      <SelectItem value="Enfants">Enfants</SelectItem>
+                      <SelectItem value="Autre">Autre</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-end">
+                  <Button 
+                    type="button" 
+                    onClick={handleAddAssignment}
+                    disabled={!newAssignment.userId || !newAssignment.role}
+                    className="w-full"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Ajouter
+                  </Button>
+                </div>
+              </div>
+
+              {/* Current Assignments */}
+              {assignments.length > 0 && (
+                <div className="space-y-2">
+                  <Label>Intervenants assignés</Label>
+                  <div className="space-y-2">
+                    {assignments.map((assignment) => {
+                      const user = getAssignedUser(assignment.userId);
+                      return (
+                        <div key={assignment.userId} className="flex items-center justify-between p-3 bg-white border rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <User className="h-4 w-4 text-muted-foreground" />
+                            <div>
+                              <span className="font-medium">
+                                {user ? `${user.firstName} ${user.lastName}` : 'Utilisateur inconnu'}
+                              </span>
+                              <Badge variant="secondary" className="ml-2">
+                                {assignment.role}
+                              </Badge>
+                            </div>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveAssignment(assignment.userId)}
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
