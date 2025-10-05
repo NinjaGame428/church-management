@@ -115,6 +115,12 @@ const adminNavigationItems = [
     badge: null
   },
   {
+    title: "Rôles",
+    href: "/admin/roles",
+    icon: Users,
+    badge: null
+  },
+  {
     title: "Rapports",
     href: "/admin/reports",
     icon: BarChart3,

@@ -33,6 +33,7 @@ interface User {
 
 interface UserAssignment {
   userId: string;
+  role: string;
 }
 
 interface Church {
@@ -48,7 +49,7 @@ interface ServiceFormData {
   time: string;
   location: string;
   status: 'DRAFT' | 'PUBLISHED' | 'CANCELLED';
-  assignments?: { userId: string }[];
+  assignments?: { userId: string; role: string }[];
 }
 
 interface ServiceModalProps {
@@ -73,9 +74,11 @@ export default function ServiceModal({
     status: 'DRAFT' as 'DRAFT' | 'PUBLISHED' | 'CANCELLED'
   });
   const [users, setUsers] = useState<User[]>([]);
+  const [roles, setRoles] = useState<any[]>([]);
   const [assignments, setAssignments] = useState<UserAssignment[]>([]);
   const [newAssignment, setNewAssignment] = useState({
-    userId: ''
+    userId: '',
+    role: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -93,7 +96,8 @@ export default function ServiceModal({
       // Convert existing assignments to the new format
       if (service.assignments) {
         setAssignments(service.assignments.map((assignment: any) => ({
-          userId: assignment.user.id
+          userId: assignment.user.id,
+          role: assignment.role || 'Intervenant'
         })));
       }
     } else {
@@ -106,13 +110,15 @@ export default function ServiceModal({
         status: 'DRAFT'
       });
       setAssignments([]);
+      setNewAssignment({ userId: '', role: '' });
     }
   }, [service]);
 
-  // Load users when modal opens
+  // Load users and roles when modal opens
   useEffect(() => {
     if (isOpen) {
       loadUsers();
+      loadRoles();
     }
   }, [isOpen]);
 
@@ -125,6 +131,18 @@ export default function ServiceModal({
       }
     } catch (error) {
       console.error('Error loading users:', error);
+    }
+  };
+
+  const loadRoles = async () => {
+    try {
+      const response = await fetch('/api/admin/roles');
+      if (response.ok) {
+        const data = await response.json();
+        setRoles(data.filter((role: any) => role.isActive));
+      }
+    } catch (error) {
+      console.error('Error loading roles:', error);
     }
   };
 
@@ -154,7 +172,7 @@ export default function ServiceModal({
   };
 
   const handleAddAssignment = () => {
-    if (newAssignment.userId) {
+    if (newAssignment.userId && newAssignment.role) {
       // Check if user is already assigned
       const isAlreadyAssigned = assignments.some(assignment => assignment.userId === newAssignment.userId);
       if (isAlreadyAssigned) {
@@ -163,8 +181,10 @@ export default function ServiceModal({
       }
 
       setAssignments(prev => [...prev, { ...newAssignment }]);
-      setNewAssignment({ userId: '' });
+      setNewAssignment({ userId: '', role: '' });
       setError('');
+    } else {
+      setError('Veuillez sélectionner un utilisateur et un rôle');
     }
   };
 
@@ -289,7 +309,7 @@ export default function ServiceModal({
               </div>
 
               {/* Add New Assignment */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
                 <div className="space-y-2">
                   <Label htmlFor="userSelect">Sélectionner un utilisateur</Label>
                   <Select 
@@ -309,11 +329,36 @@ export default function ServiceModal({
                   </Select>
                 </div>
 
+                <div className="space-y-2">
+                  <Label htmlFor="roleSelect">Rôle dans le service</Label>
+                  <Select 
+                    value={newAssignment.role} 
+                    onValueChange={(value) => setNewAssignment(prev => ({ ...prev, role: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choisir un rôle" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {roles.map((role) => (
+                        <SelectItem key={role.id} value={role.name}>
+                          <div className="flex items-center gap-2">
+                            <div 
+                              className="w-3 h-3 rounded-full" 
+                              style={{ backgroundColor: role.color }}
+                            />
+                            {role.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 <div className="flex items-end">
                   <Button 
                     type="button" 
                     onClick={handleAddAssignment}
-                    disabled={!newAssignment.userId}
+                    disabled={!newAssignment.userId || !newAssignment.role}
                     className="w-full"
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -334,11 +379,28 @@ export default function ServiceModal({
                           <div className="flex items-center gap-3">
                             <User className="h-4 w-4 text-muted-foreground" />
                             <div>
-                              <span className="font-medium">
-                                {user ? `${user.firstName} ${user.lastName}` : 'Utilisateur inconnu'}
-                              </span>
-                              <span className="text-sm text-muted-foreground ml-2">
-                                ({user?.email})
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">
+                                  {user ? `${user.firstName} ${user.lastName}` : 'Utilisateur inconnu'}
+                                </span>
+                                <Badge 
+                                  variant="secondary" 
+                                  className="text-xs"
+                                  style={{ 
+                                    backgroundColor: roles.find(r => r.name === assignment.role)?.color + '20',
+                                    color: roles.find(r => r.name === assignment.role)?.color,
+                                    borderColor: roles.find(r => r.name === assignment.role)?.color + '40'
+                                  }}
+                                >
+                                  <div 
+                                    className="w-2 h-2 rounded-full mr-1" 
+                                    style={{ backgroundColor: roles.find(r => r.name === assignment.role)?.color }}
+                                  />
+                                  {assignment.role}
+                                </Badge>
+                              </div>
+                              <span className="text-sm text-muted-foreground">
+                                {user?.email}
                               </span>
                             </div>
                           </div>

@@ -294,7 +294,7 @@ export default function AdminCalendar() {
                             <p className="text-sm text-muted-foreground mb-3">{service.description}</p>
                           )}
                           <div className="text-sm">
-                            <span className="font-medium">Église:</span> {service.church.name}
+                            <span className="font-medium">Church:</span> {service.church.name}
                           </div>
                         </div>
                         <div className="flex gap-2 ml-4">

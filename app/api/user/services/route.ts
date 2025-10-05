@@ -12,38 +12,51 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const services = await prisma.service.findMany({
+    // Get service assignments for the user
+    const assignments = await prisma.serviceAssignment.findMany({
       where: {
-        assignments: {
-          some: {
-            userId: userId
-          }
-        }
+        userId: userId
       },
       include: {
-        assignments: {
+        service: {
           include: {
-            user: {
+            church: {
               select: {
                 id: true,
-                firstName: true,
-                lastName: true,
-                email: true
+                name: true
               }
             }
           }
-        },
-        church: {
-          select: {
-            id: true,
-            name: true
-          }
         }
       },
-      orderBy: { date: 'asc' }
+      orderBy: { 
+        service: {
+          date: 'asc'
+        }
+      }
     })
 
-    return NextResponse.json(services)
+    // Transform the data to match the expected structure
+    const transformedAssignments = assignments.map((assignment: any) => ({
+      id: assignment.id,
+      role: assignment.role,
+      status: assignment.status,
+      service: {
+        id: assignment.service.id,
+        title: assignment.service.title,
+        description: assignment.service.description,
+        date: assignment.service.date,
+        time: assignment.service.time,
+        location: assignment.service.location,
+        status: assignment.service.status,
+        church: {
+          id: assignment.service.church.id,
+          name: assignment.service.church.name
+        }
+      }
+    }))
+
+    return NextResponse.json(transformedAssignments)
   } catch (error) {
     console.error('Get user services error:', error)
     return NextResponse.json(

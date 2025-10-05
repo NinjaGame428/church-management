@@ -128,7 +128,7 @@ export default function AdminSignupPage() {
                     id="churchName"
                     name="churchName"
                     type="text"
-                    placeholder="Église de la Paix"
+                    placeholder="Impact Centre Chrétien"
                     className="pl-10"
                     required
                   />

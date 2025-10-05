@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   Calendar, 
   Clock, 
@@ -44,6 +47,9 @@ export default function UserServices() {
   const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [declineReason, setDeclineReason] = useState('');
+  const [showDeclineModal, setShowDeclineModal] = useState(false);
+  const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?.id) {
@@ -72,6 +78,12 @@ export default function UserServices() {
 
   const handleAssignmentAction = async (assignmentId: string, action: 'accept' | 'decline') => {
     try {
+      if (action === 'decline') {
+        setSelectedAssignmentId(assignmentId);
+        setShowDeclineModal(true);
+        return;
+      }
+
       const response = await fetch(`/api/user/service-assignments/${assignmentId}`, {
         method: 'PUT',
         headers: {
@@ -81,7 +93,7 @@ export default function UserServices() {
       });
 
       if (response.ok) {
-        setMessage(action === 'accept' ? 'Service accepté!' : 'Service décliné!');
+        setMessage('Service accepté!');
         loadUserServices();
         setTimeout(() => setMessage(''), 3000);
       } else {
@@ -92,6 +104,48 @@ export default function UserServices() {
       console.error('Error updating assignment:', error);
       setError('Erreur lors de la mise à jour');
     }
+  };
+
+  const handleDeclineWithReason = async () => {
+    if (!declineReason.trim()) {
+      setError('Veuillez fournir une raison pour refuser ce service');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/user/service-assignments/${selectedAssignmentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          action: 'decline',
+          reason: declineReason.trim()
+        }),
+      });
+
+      if (response.ok) {
+        setMessage('Service décliné avec succès!');
+        setShowDeclineModal(false);
+        setDeclineReason('');
+        setSelectedAssignmentId(null);
+        loadUserServices();
+        setTimeout(() => setMessage(''), 3000);
+      } else {
+        const errorData = await response.json();
+        console.error('Error response:', errorData);
+        setError(errorData.error || errorData.details || 'Erreur lors de la mise à jour');
+      }
+    } catch (error) {
+      console.error('Error declining assignment:', error);
+      setError('Erreur lors de la mise à jour');
+    }
+  };
+
+  const handleCancelDecline = () => {
+    setShowDeclineModal(false);
+    setDeclineReason('');
+    setSelectedAssignmentId(null);
   };
 
   const getStatusColor = (status: string) => {
@@ -240,7 +294,7 @@ export default function UserServices() {
                     )}
 
                     <div className="text-sm text-muted-foreground">
-                      <span className="font-medium">Église:</span> {assignment.service.church.name}
+                      <span className="font-medium">Church:</span> {assignment.service.church.name}
                     </div>
 
                     {/* Action Buttons for Pending Assignments */}
@@ -283,6 +337,52 @@ export default function UserServices() {
                 </CardContent>
               </Card>
             ))}
+          </div>
+        )}
+
+        {/* Decline Reason Modal */}
+        {showDeclineModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <Card className="w-full max-w-md mx-4">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <XCircle className="h-5 w-5 text-red-600" />
+                  Refuser le service
+                </CardTitle>
+                <CardDescription>
+                  Veuillez fournir une raison pour refuser ce service. Cette information sera transmise à l'administrateur.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="declineReason">Raison du refus *</Label>
+                  <Textarea
+                    id="declineReason"
+                    placeholder="Expliquez pourquoi vous ne pouvez pas participer à ce service..."
+                    value={declineReason}
+                    onChange={(e) => setDeclineReason(e.target.value)}
+                    className="mt-1"
+                    rows={4}
+                  />
+                </div>
+                <div className="flex gap-2 justify-end">
+                  <Button
+                    variant="outline"
+                    onClick={handleCancelDecline}
+                  >
+                    Annuler
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    onClick={handleDeclineWithReason}
+                    disabled={!declineReason.trim()}
+                  >
+                    <XCircle className="h-4 w-4 mr-1" />
+                    Confirmer le refus
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         )}
       </div>

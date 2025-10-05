@@ -64,18 +64,31 @@ model Service {
 }
 
 model ServiceAssignment {
-  id        String           @id @default(cuid())
-  serviceId String
-  userId    String
-  role      String
-  status    AssignmentStatus @default(PENDING)
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-  service   Service          @relation(fields: [serviceId], references: [id], onDelete: Cascade)
-  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id            String           @id @default(cuid())
+  serviceId      String
+  userId        String
+  role          String
+  status        AssignmentStatus @default(PENDING)
+  declineReason String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  service       Service          @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([serviceId, userId])
   @@map("service_assignments")
+}
+
+model ServiceRole {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  color       String?  @default("#3B82F6")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("service_roles")
 }
 
 model Availability {

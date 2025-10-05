@@ -3,14 +3,41 @@ import { prisma } from '@/lib/prisma'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { status } = await request.json()
+    const { action, reason } = await request.json()
+    const { id } = await params
+
+    // Validate action
+    if (!action || !['accept', 'decline'].includes(action)) {
+      return NextResponse.json(
+        { error: 'Invalid action. Must be "accept" or "decline"' },
+        { status: 400 }
+      )
+    }
+
+    // If declining, require a reason
+    if (action === 'decline' && !reason?.trim()) {
+      return NextResponse.json(
+        { error: 'Reason is required when declining a service' },
+        { status: 400 }
+      )
+    }
+
+    const status = action === 'accept' ? 'CONFIRMED' : 'DECLINED'
+
+    const updateData: any = { 
+      status: status as 'PENDING' | 'CONFIRMED' | 'DECLINED'
+    }
+    
+    if (action === 'decline' && reason) {
+      updateData.declineReason = reason
+    }
 
     const assignment = await prisma.serviceAssignment.update({
-      where: { id: params.id },
-      data: { status: status as 'PENDING' | 'CONFIRMED' | 'DECLINED' },
+      where: { id },
+      data: updateData,
       include: {
         service: {
           select: {
@@ -35,12 +62,13 @@ export async function PUT(
           userId: assignment.userId,
           type: 'assignment_response',
           title: `Service ${status === 'CONFIRMED' ? 'confirmé' : 'refusé'}`,
-          message: `Vous avez ${status === 'CONFIRMED' ? 'confirmé' : 'refusé'} votre participation au service "${assignment.service.title}"`,
+          message: `Vous avez ${status === 'CONFIRMED' ? 'confirmé' : 'refusé'} votre participation au service "${assignment.service.title}"${reason ? ` - Raison: ${reason}` : ''}`,
           data: {
             serviceId: assignment.serviceId,
             serviceTitle: assignment.service.title,
             date: assignment.service.date,
-            status: status
+            status: status,
+            ...(reason && { reason })
           }
         }
       })
@@ -50,7 +78,10 @@ export async function PUT(
   } catch (error) {
     console.error('Update service assignment error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { 
+        error: 'Internal server error',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     )
   }

@@ -76,9 +76,9 @@ export async function POST(request: NextRequest) {
           status: status as 'DRAFT' | 'PUBLISHED' | 'CANCELLED',
           churchId: church.id,
           assignments: {
-            create: assignments.map((assignment: { userId: string }) => ({
+            create: assignments.map((assignment: { userId: string; role: string }) => ({
               userId: assignment.userId,
-              role: 'Intervenant',
+              role: assignment.role || 'Intervenant',
               status: 'PENDING'
             }))
           }
@@ -107,17 +107,18 @@ export async function POST(request: NextRequest) {
       // Create notifications for assigned users
       if (assignments.length > 0) {
         await tx.notification.createMany({
-          data: assignments.map((assignment: { userId: string }) => ({
+          data: assignments.map((assignment: { userId: string; role: string }) => ({
             userId: assignment.userId,
             type: 'service_assignment',
             title: 'Nouveau service assigné',
-            message: `Vous avez été assigné au service "${title}" le ${new Date(date).toLocaleDateString('fr-FR')} à ${time}`,
+            message: `Vous avez été assigné au service "${title}" le ${new Date(date).toLocaleDateString('fr-FR')} à ${time} en tant que ${assignment.role || 'Intervenant'}`,
             data: {
               serviceId: newService.id,
               serviceTitle: title,
               date: date,
               time: time,
-              location: location
+              location: location,
+              role: assignment.role || 'Intervenant'
             }
           }))
         });

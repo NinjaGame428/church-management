@@ -8,10 +8,10 @@ async function main() {
 
   // Create demo church
   const church = await prisma.church.upsert({
-    where: { name: 'Église de la Paix' },
+    where: { name: 'Impact Centre Chrétien' },
     update: {},
     create: {
-      name: 'Église de la Paix',
+      name: 'Impact Centre Chrétien',
       address: '123 Rue de la Paix, 75001 Paris'
     }
   })
@@ -138,6 +138,27 @@ async function main() {
       status: 'AVAILABLE'
     }
   })
+
+  // Create default service roles
+  const defaultRoles = [
+    { name: 'Louange', description: 'Responsable de la louange et du chant', color: '#8B5CF6' },
+    { name: 'Son', description: 'Responsable de la technique sonore', color: '#06B6D4' },
+    { name: 'Accueil', description: 'Responsable de l\'accueil des fidèles', color: '#10B981' },
+    { name: 'Lecture', description: 'Responsable des lectures bibliques', color: '#F59E0B' },
+    { name: 'Prédication', description: 'Responsable de la prédication', color: '#EF4444' },
+    { name: 'Prière', description: 'Responsable des moments de prière', color: '#3B82F6' },
+    { name: 'Communion', description: 'Responsable de la communion', color: '#8B5CF6' },
+    { name: 'Offrande', description: 'Responsable de la collecte d\'offrandes', color: '#F59E0B' },
+    { name: 'Intervenant', description: 'Participant général au service', color: '#6B7280' }
+  ]
+
+  for (const roleData of defaultRoles) {
+    await prisma.serviceRole.upsert({
+      where: { name: roleData.name },
+      update: {},
+      create: roleData
+    })
+  }
 
   console.log('✅ Database seeded successfully!')
   console.log('👤 Admin user: admin@church.com / admin123')
