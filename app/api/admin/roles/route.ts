@@ -7,6 +7,9 @@ export async function GET(request: NextRequest) {
       orderBy: { name: 'asc' }
     })
 
+    console.log('Roles from database:', roles.length, 'roles found');
+    console.log('Role names:', roles.map(r => r.name));
+    
     return NextResponse.json(roles)
   } catch (error) {
     console.error('Get roles error:', error)
