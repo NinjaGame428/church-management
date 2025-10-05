@@ -5,8 +5,10 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 interface User {
   id: string;
   email: string;
-  name: string;
-  role: 'admin' | 'user';
+  firstName: string;
+  lastName: string;
+  role: 'ADMIN' | 'USER';
+  churchId?: string;
   churchName?: string;
 }
 
@@ -24,7 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check if user is logged in (in a real app, this would check localStorage or cookies)
+    // Check if user is logged in
     const savedUser = localStorage.getItem('churchUser');
     if (savedUser) {
       setUser(JSON.parse(savedUser));
@@ -35,38 +37,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Demo authentication logic
-    let userData: User | null = null;
-    
-    if (email === 'admin@church.com' && password === 'admin123') {
-      userData = {
-        id: '1',
-        email: 'admin@church.com',
-        name: 'Administrateur',
-        role: 'admin',
-        churchName: 'Église de la Paix'
-      };
-    } else if (email === 'user@church.com' && password === 'user123') {
-      userData = {
-        id: '2',
-        email: 'user@church.com',
-        name: 'Jean Dupont',
-        role: 'user'
-      };
-    }
-    
-    if (userData) {
-      setUser(userData);
-      localStorage.setItem('churchUser', JSON.stringify(userData));
+    try {
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+        localStorage.setItem('churchUser', JSON.stringify(userData));
+        setIsLoading(false);
+        return true;
+      } else {
+        setIsLoading(false);
+        return false;
+      }
+    } catch (error) {
+      console.error('Login error:', error);
       setIsLoading(false);
-      return true;
+      return false;
     }
-    
-    setIsLoading(false);
-    return false;
   };
 
   const logout = () => {

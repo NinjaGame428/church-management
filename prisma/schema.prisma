@@ -1,0 +1,119 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  firstName String
+  lastName  String
+  phone     String?
+  role      UserRole @default(USER)
+  churchId  String?
+  church    Church?  @relation(fields: [churchId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  services ServiceAssignment[]
+  availability Availability[]
+
+  @@map("users")
+}
+
+model Church {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  users    User[]
+  services Service[]
+
+  @@map("churches")
+}
+
+model Service {
+  id          String        @id @default(cuid())
+  title       String
+  description String?
+  date        DateTime
+  time        String
+  location    String
+  status      ServiceStatus @default(DRAFT)
+  churchId    String
+  church      Church        @relation(fields: [churchId], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  // Relations
+  assignments ServiceAssignment[]
+
+  @@map("services")
+}
+
+model ServiceAssignment {
+  id        String   @id @default(cuid())
+  serviceId String
+  userId    String
+  role      String
+  status    AssignmentStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([serviceId, userId])
+  @@map("service_assignments")
+}
+
+model Availability {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime
+  status    AvailabilityStatus @default(AVAILABLE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("availability")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum ServiceStatus {
+  DRAFT
+  PUBLISHED
+  CANCELLED
+}
+
+enum AssignmentStatus {
+  PENDING
+  CONFIRMED
+  DECLINED
+}
+
+enum AvailabilityStatus {
+  AVAILABLE
+  UNAVAILABLE
+  BUSY
+}

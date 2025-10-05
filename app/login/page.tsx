@@ -20,7 +20,7 @@ export default function LoginPage() {
   // Redirect if already logged in
   React.useEffect(() => {
     if (user) {
-      if (user.role === 'admin') {
+      if (user.role === 'ADMIN') {
         router.push('/admin/dashboard');
       } else {
         router.push('/user/dashboard');

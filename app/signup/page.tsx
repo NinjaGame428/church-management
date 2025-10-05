@@ -9,22 +9,53 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, Building, Phone } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [userType, setUserType] = useState("");
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulate registration process
-    setTimeout(() => {
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const userData = {
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+      firstName: formData.get('firstName') as string,
+      lastName: formData.get('lastName') as string,
+      phone: formData.get('phone') as string,
+      role: userType === 'admin' ? 'ADMIN' : 'USER',
+      churchName: userType === 'admin' ? formData.get('churchName') as string : undefined,
+      churchAddress: userType === 'admin' ? formData.get('churchAddress') as string : undefined,
+    };
+
+    try {
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (response.ok) {
+        // Registration successful, redirect to login
+        router.push('/login?message=Registration successful');
+      } else {
+        const error = await response.json();
+        alert(error.error || 'Registration failed');
+      }
+    } catch (error) {
+      console.error('Registration error:', error);
+      alert('Registration failed');
+    } finally {
       setIsLoading(false);
-      // Handle registration logic here
-    }, 1000);
+    }
   };
 
   return (
