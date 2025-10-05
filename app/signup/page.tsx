@@ -117,6 +117,7 @@ export default function SignupPage() {
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="firstName"
+                      name="firstName"
                       type="text"
                       placeholder="Jean"
                       className="pl-10"
@@ -130,6 +131,7 @@ export default function SignupPage() {
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="lastName"
+                      name="lastName"
                       type="text"
                       placeholder="Dupont"
                       className="pl-10"
@@ -148,6 +150,7 @@ export default function SignupPage() {
                       <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
                         id="churchName"
+                        name="churchName"
                         type="text"
                         placeholder="Église de la Paix"
                         className="pl-10"
@@ -159,6 +162,7 @@ export default function SignupPage() {
                     <Label htmlFor="churchAddress">Adresse de l'église</Label>
                     <Input
                       id="churchAddress"
+                      name="churchAddress"
                       type="text"
                       placeholder="123 Rue de la Paix, 75001 Paris"
                     />
@@ -173,6 +177,7 @@ export default function SignupPage() {
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
+                    name="email"
                     type="email"
                     placeholder="votre@email.com"
                     className="pl-10"
@@ -187,6 +192,7 @@ export default function SignupPage() {
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="phone"
+                    name="phone"
                     type="tel"
                     placeholder="+33 1 23 45 67 89"
                     className="pl-10"
@@ -201,6 +207,7 @@ export default function SignupPage() {
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     className="pl-10 pr-10"
@@ -228,6 +235,7 @@ export default function SignupPage() {
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="confirmPassword"
+                    name="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     placeholder="••••••••"
                     className="pl-10 pr-10"
