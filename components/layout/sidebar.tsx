@@ -20,7 +20,8 @@ import {
   Home,
   Users,
   FileText,
-  BarChart3
+  BarChart3,
+  RefreshCw
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNotifications } from "@/components/notifications/notification-provider";
@@ -105,6 +106,12 @@ const adminNavigationItems = [
     title: "Disponibilités",
     href: "/admin/availabilities",
     icon: Clock,
+    badge: null
+  },
+  {
+    title: "Demandes d'Échange",
+    href: "/admin/swap-requests",
+    icon: RefreshCw,
     badge: null
   },
   {

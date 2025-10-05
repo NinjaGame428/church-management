@@ -8,16 +8,16 @@ export async function PUT(
   try {
     const { status } = await request.json()
 
-    if (!['accepted', 'rejected', 'admin_approved', 'admin_rejected'].includes(status)) {
+    if (!['admin_approved', 'admin_rejected'].includes(status)) {
       return NextResponse.json(
-        { error: 'Invalid status' },
+        { error: 'Invalid status. Must be admin_approved or admin_rejected' },
         { status: 400 }
       )
     }
 
     const swapRequest = await prisma.swapRequest.update({
       where: { id: params.id },
-      data: { status: status as 'accepted' | 'rejected' | 'admin_approved' | 'admin_rejected' },
+      data: { status: status as 'admin_approved' | 'admin_rejected' },
       include: {
         fromUser: {
           select: {
@@ -44,7 +44,7 @@ export async function PUT(
       }
     })
 
-    // Only execute the swap when admin approves
+    // If admin approves, execute the swap
     if (status === 'admin_approved') {
       // Update the service assignment to swap users
       await prisma.serviceAssignment.updateMany({
@@ -107,6 +107,36 @@ export async function PUT(
           }
         ]
       })
+    } else if (status === 'admin_rejected') {
+      // Create notifications for both users about the rejected swap
+      await prisma.notification.createMany({
+        data: [
+          {
+            userId: swapRequest.fromUserId,
+            type: 'swap_rejected',
+            title: 'Échange rejeté',
+            message: `Votre demande d'échange avec ${swapRequest.toUser.firstName} ${swapRequest.toUser.lastName} a été rejetée par l'administrateur.`,
+            data: {
+              swapRequestId: swapRequest.id,
+              serviceId: swapRequest.serviceId,
+              serviceTitle: swapRequest.service?.title,
+              date: swapRequest.date.toISOString().split('T')[0]
+            }
+          },
+          {
+            userId: swapRequest.toUserId,
+            type: 'swap_rejected',
+            title: 'Échange rejeté',
+            message: `L'échange avec ${swapRequest.fromUser.firstName} ${swapRequest.fromUser.lastName} a été rejeté par l'administrateur.`,
+            data: {
+              swapRequestId: swapRequest.id,
+              serviceId: swapRequest.serviceId,
+              serviceTitle: swapRequest.service?.title,
+              date: swapRequest.date.toISOString().split('T')[0]
+            }
+          }
+        ]
+      })
     }
 
     return NextResponse.json({
@@ -120,7 +150,7 @@ export async function PUT(
       message: swapRequest.message
     })
   } catch (error) {
-    console.error('Update swap request error:', error)
+    console.error('Update admin swap request error:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

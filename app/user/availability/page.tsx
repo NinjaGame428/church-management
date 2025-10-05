@@ -41,7 +41,7 @@ interface SwapRequest {
   serviceId: string;
   serviceTitle: string;
   date: string;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: 'pending' | 'accepted' | 'rejected' | 'admin_approved' | 'admin_rejected';
   message?: string;
 }
 
@@ -327,10 +327,14 @@ export default function AvailabilityPage() {
                             <div className="flex items-center gap-2 mb-2">
                               <Badge 
                                 variant={request.status === 'pending' ? 'secondary' :
-                                        request.status === 'accepted' ? 'default' : 'destructive'}
+                                        request.status === 'accepted' ? 'default' : 
+                                        request.status === 'admin_approved' ? 'default' :
+                                        request.status === 'admin_rejected' ? 'destructive' : 'destructive'}
                               >
                                 {request.status === 'pending' ? 'En attente' :
-                                 request.status === 'accepted' ? 'Acceptée' : 'Rejetée'}
+                                 request.status === 'accepted' ? 'Acceptée - En attente admin' :
+                                 request.status === 'admin_approved' ? 'Approuvée par admin' :
+                                 request.status === 'admin_rejected' ? 'Rejetée par admin' : 'Rejetée'}
                               </Badge>
                             </div>
                             <p className="font-medium">{request.serviceTitle}</p>
