@@ -12,7 +12,7 @@ import {
   Calendar, 
   Clock, 
   User, 
-  Swap, 
+  RefreshCw, 
   CheckCircle, 
   XCircle, 
   AlertCircle,
@@ -357,7 +357,7 @@ export default function AvailabilityPage() {
                               variant="outline"
                               onClick={() => handleSwapRequest(availability)}
                             >
-                              <Swap className="h-4 w-4" />
+                              <RefreshCw className="h-4 w-4" />
                             </Button>
                             <Button 
                               size="sm" 
@@ -482,7 +482,7 @@ export default function AvailabilityPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Swap className="h-5 w-5" />
+                  <RefreshCw className="h-5 w-5" />
                   Demandes d'Échange
                 </CardTitle>
                 <CardDescription>
@@ -492,7 +492,7 @@ export default function AvailabilityPage() {
               <CardContent>
                 {swapRequests.length === 0 ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    <Swap className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <RefreshCw className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p>Aucune demande d'échange</p>
                   </div>
                 ) : (
