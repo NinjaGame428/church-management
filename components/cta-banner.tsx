@@ -2,6 +2,7 @@ import { ArrowUpRight, Forward } from "lucide-react";
 import { Button } from "./ui/button";
 import { AnimatedGridPattern } from "./ui/animated-grid-pattern";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export default function CTABanner() {
   return (
@@ -35,11 +36,15 @@ export default function CTABanner() {
           </p>
         </div>
         <div className="relative z-0 mt-14 flex flex-col sm:flex-row gap-4">
-          <Button size="lg">
-            Commencer Gratuitement <ArrowUpRight className="!h-5 !w-5" />
+          <Button size="lg" asChild>
+            <Link href="/signup">
+              Commencer Gratuitement <ArrowUpRight className="!h-5 !w-5" />
+            </Link>
           </Button>
-          <Button size="lg" variant="outline">
-            Voir la Démo <Forward className="!h-5 !w-5" />
+          <Button size="lg" variant="outline" asChild>
+            <Link href="#dashboards">
+              Voir la Démo <Forward className="!h-5 !w-5" />
+            </Link>
           </Button>
         </div>
       </div>

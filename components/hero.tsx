@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpRight, Calendar, Users, Shield } from "lucide-react";
 import React from "react";
 import LogoCloud from "./logo-cloud";
+import Link from "next/link";
 
 const Hero = () => {
   return (
@@ -24,15 +25,21 @@ const Hero = () => {
             <Button
               size="lg"
               className="w-full sm:w-auto rounded-full text-base"
+              asChild
             >
-              Commencer <ArrowUpRight className="!h-5 !w-5" />
+              <Link href="/signup">
+                Commencer <ArrowUpRight className="!h-5 !w-5" />
+              </Link>
             </Button>
             <Button
               variant="outline"
               size="lg"
               className="w-full sm:w-auto rounded-full text-base shadow-none"
+              asChild
             >
-              <Calendar className="!h-5 !w-5" /> Voir le Calendrier
+              <Link href="#dashboards">
+                <Calendar className="!h-5 !w-5" /> Voir le Calendrier
+              </Link>
             </Button>
           </div>
         </div>
