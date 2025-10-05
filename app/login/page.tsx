@@ -36,11 +36,14 @@ export default function LoginPage() {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     
+    console.log('Attempting login for:', email);
     const success = await login(email, password);
     
     if (success) {
+      console.log('Login successful, redirecting...');
       // Redirect will happen automatically via useEffect
     } else {
+      console.log('Login failed');
       setError('Email ou mot de passe incorrect');
     }
   };

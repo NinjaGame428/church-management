@@ -13,21 +13,27 @@ export interface User {
 
 export async function authenticateUser(email: string, password: string): Promise<User | null> {
   try {
+    console.log('Looking for user with email:', email)
     const user = await prisma.user.findUnique({
       where: { email },
       include: { church: true }
     })
 
     if (!user) {
+      console.log('User not found for email:', email)
       return null
     }
 
+    console.log('User found:', user.email, 'Role:', user.role)
     const isValidPassword = await bcrypt.compare(password, user.password)
+    console.log('Password valid:', isValidPassword)
+    
     if (!isValidPassword) {
+      console.log('Invalid password for user:', email)
       return null
     }
 
-    return {
+    const userData = {
       id: user.id,
       email: user.email,
       firstName: user.firstName,
@@ -36,6 +42,8 @@ export async function authenticateUser(email: string, password: string): Promise
       churchId: user.churchId || undefined,
       churchName: user.church?.name
     }
+    console.log('Returning user data:', userData)
+    return userData
   } catch (error) {
     console.error('Authentication error:', error)
     return null

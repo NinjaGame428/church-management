@@ -48,11 +48,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.ok) {
         const userData = await response.json();
+        console.log('Login successful, user data:', userData);
         setUser(userData);
         localStorage.setItem('churchUser', JSON.stringify(userData));
         setIsLoading(false);
         return true;
       } else {
+        const errorData = await response.json();
+        console.error('Login failed:', response.status, errorData);
         setIsLoading(false);
         return false;
       }
