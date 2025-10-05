@@ -21,6 +21,8 @@ interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  updateUser: (userData: Partial<User>) => void;
+  refreshUser: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -76,8 +78,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem('churchUser');
   };
 
+  const updateUser = (userData: Partial<User>) => {
+    if (user) {
+      const updatedUser = { ...user, ...userData };
+      setUser(updatedUser);
+      localStorage.setItem('churchUser', JSON.stringify(updatedUser));
+    }
+  };
+
+  const refreshUser = async () => {
+    if (!user) return;
+
+    try {
+      const response = await fetch(`/api/user/profile?userId=${user.id}`);
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+        localStorage.setItem('churchUser', JSON.stringify(userData));
+      }
+    } catch (error) {
+      console.error('Error refreshing user data:', error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, updateUser, refreshUser, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

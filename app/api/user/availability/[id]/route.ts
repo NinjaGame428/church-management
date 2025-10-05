@@ -9,8 +9,6 @@ export async function PUT(
     const { 
       userId,
       date, 
-      startTime, 
-      endTime, 
       status, 
       notes, 
       serviceId 
@@ -30,9 +28,9 @@ export async function PUT(
       },
       data: {
         date: new Date(date),
-        startTime,
-        endTime,
-        status: status as 'available' | 'unavailable' | 'busy',
+        startTime: '09:00', // Default start time
+        endTime: '17:00',   // Default end time
+        status: status.toUpperCase() as 'AVAILABLE' | 'UNAVAILABLE' | 'BUSY',
         notes,
         serviceId: serviceId || null
       },
@@ -51,7 +49,7 @@ export async function PUT(
       date: availability.date.toISOString().split('T')[0],
       startTime: availability.startTime,
       endTime: availability.endTime,
-      status: availability.status,
+      status: availability.status.toLowerCase(),
       notes: availability.notes,
       serviceId: availability.serviceId,
       serviceTitle: availability.service?.title

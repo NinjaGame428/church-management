@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import MonthlyCalendar from "@/components/calendar/monthly-calendar";
 import ServiceDetailsModal from "@/components/calendar/service-details-modal";
+import DashboardLayout from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -143,50 +144,10 @@ export default function CalendarPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-4">
-            <div>
-              <h1 className="text-3xl font-bold">Calendrier des Services</h1>
-              <p className="text-muted-foreground">Consultez les services programmés et gérez vos disponibilités</p>
-            </div>
-            <div className="flex items-center gap-3">
-              {user ? (
-                <>
-                  <Button variant="outline" asChild>
-                    <Link href="/user/availability">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Ma Disponibilité
-                    </Link>
-                  </Button>
-                  <Button variant="outline" asChild>
-                    <Link href="/user/dashboard">
-                      <User className="h-4 w-4 mr-2" />
-                      Mon Tableau de Bord
-                    </Link>
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button variant="outline" asChild>
-                    <Link href="/login">
-                      <User className="h-4 w-4 mr-2" />
-                      Se Connecter
-                    </Link>
-                  </Button>
-                  <Button asChild>
-                    <Link href="/signup">
-                      <Plus className="h-4 w-4 mr-2" />
-                      S'inscrire
-                    </Link>
-                  </Button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
+    <DashboardLayout 
+      title="Calendrier des Services"
+      description="Consultez les services programmés et gérez vos disponibilités"
+    >
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Calendar */}
@@ -292,7 +253,6 @@ export default function CalendarPage() {
           onSwapRequest={handleSwapRequest}
           currentUserId={user.id}
         />
-      </div>
-    </div>
+    </DashboardLayout>
   );
 }

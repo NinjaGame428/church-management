@@ -25,12 +25,12 @@ export async function GET(request: NextRequest) {
       orderBy: { date: 'asc' }
     })
 
-    const formattedAvailabilities = availabilities.map(av => ({
+    const formattedAvailabilities = availabilities.map((av: any) => ({
       id: av.id,
       date: av.date.toISOString().split('T')[0],
       startTime: av.startTime,
       endTime: av.endTime,
-      status: av.status,
+      status: av.status.toLowerCase(),
       notes: av.notes,
       serviceId: av.serviceId,
       serviceTitle: av.service?.title
@@ -51,12 +51,12 @@ export async function POST(request: NextRequest) {
     const { 
       userId,
       date, 
-      startTime, 
-      endTime, 
       status, 
       notes, 
       serviceId 
     } = await request.json()
+
+    console.log('Creating availability with data:', { userId, date, status, notes, serviceId })
 
     if (!userId) {
       return NextResponse.json(
@@ -65,13 +65,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (!date) {
+      return NextResponse.json(
+        { error: 'Date is required' },
+        { status: 400 }
+      )
+    }
+
     const availability = await prisma.availability.create({
       data: {
         userId,
         date: new Date(date),
-        startTime,
-        endTime,
-        status: status as 'available' | 'unavailable' | 'busy',
+        startTime: '09:00', // Default start time
+        endTime: '17:00',   // Default end time
+        status: status.toUpperCase() as 'AVAILABLE' | 'UNAVAILABLE' | 'BUSY',
         notes,
         serviceId: serviceId || null
       },
@@ -85,12 +92,14 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    console.log('Availability created successfully:', availability.id)
+
     return NextResponse.json({
       id: availability.id,
       date: availability.date.toISOString().split('T')[0],
       startTime: availability.startTime,
       endTime: availability.endTime,
-      status: availability.status,
+      status: availability.status.toLowerCase(),
       notes: availability.notes,
       serviceId: availability.serviceId,
       serviceTitle: availability.service?.title
@@ -98,7 +107,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Create availability error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

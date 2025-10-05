@@ -6,77 +6,21 @@ import { Badge } from "@/components/ui/badge";
 import { 
   Calendar, 
   Users, 
-  Settings, 
-  Bell, 
   Plus,
   Clock,
   CheckCircle,
   AlertCircle,
   UserPlus,
-  BarChart3,
-  LogOut
+  BarChart3
 } from "lucide-react";
-import Link from "next/link";
-import { useState } from "react";
+import DashboardLayout from "@/components/layout/dashboard-layout";
 
 export default function AdminDashboard() {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleLogout = () => {
-    setIsLoading(true);
-    // Handle logout logic here
-    setTimeout(() => {
-      window.location.href = "/login";
-    }, 1000);
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="text-primary-foreground"
-                >
-                  <path
-                    d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-xl font-semibold">ChurchManager</h1>
-                <p className="text-sm text-muted-foreground">Tableau d'administration</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm">
-                <Bell className="h-4 w-4 mr-2" />
-                Notifications
-              </Button>
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4 mr-2" />
-                Paramètres
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleLogout} disabled={isLoading}>
-                <LogOut className="h-4 w-4 mr-2" />
-                {isLoading ? "Déconnexion..." : "Déconnexion"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <DashboardLayout 
+      title="Tableau d'Administration"
+      description="Gérez vos services et intervenants en toute simplicité"
+    >
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900">Bonjour, Administrateur</h2>
@@ -224,7 +168,6 @@ export default function AdminDashboard() {
             </div>
           </CardContent>
         </Card>
-      </div>
-    </div>
+    </DashboardLayout>
   );
 }

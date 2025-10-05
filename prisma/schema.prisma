@@ -8,26 +8,26 @@ datasource db {
 }
 
 model User {
-  id           String              @id @default(cuid())
-  email        String              @unique
-  password     String
-  firstName    String
-  lastName     String
-  phone        String?
-  department   String?
-  position     String?
-  bio          String?
-  avatar       String?
-  role         UserRole            @default(USER)
-  churchId     String?
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
-  availability Availability[]
-  services     ServiceAssignment[]
-  church       Church?             @relation(fields: [churchId], references: [id])
-  swapRequestsFrom SwapRequest[]   @relation("SwapRequestFrom")
-  swapRequestsTo   SwapRequest[]   @relation("SwapRequestTo")
-  notifications Notification[]
+  id               String              @id @default(cuid())
+  email            String              @unique
+  password         String
+  firstName        String
+  lastName         String
+  phone            String?
+  role             UserRole            @default(USER)
+  churchId         String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  avatar           String?
+  bio              String?
+  department       String?
+  position         String?
+  availability     Availability[]
+  notifications    Notification[]
+  services         ServiceAssignment[]
+  swapRequestsFrom SwapRequest[]       @relation("SwapRequestFrom")
+  swapRequestsTo   SwapRequest[]       @relation("SwapRequestTo")
+  church           Church?             @relation(fields: [churchId], references: [id])
 
   @@map("users")
 }
@@ -45,19 +45,20 @@ model Church {
 }
 
 model Service {
-  id          String              @id @default(cuid())
-  title       String
-  description String?
-  date        DateTime
-  time        String
-  location    String
-  status      ServiceStatus       @default(DRAFT)
-  churchId    String
-  createdAt   DateTime            @default(now())
-  updatedAt   DateTime            @updatedAt
-  assignments ServiceAssignment[]
-  church      Church              @relation(fields: [churchId], references: [id])
-  swapRequests SwapRequest[]
+  id             String              @id @default(cuid())
+  title          String
+  description    String?
+  date           DateTime
+  time           String
+  location       String
+  status         ServiceStatus       @default(DRAFT)
+  churchId       String
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  availabilities Availability[]
+  assignments    ServiceAssignment[]
+  church         Church              @relation(fields: [churchId], references: [id])
+  swapRequests   SwapRequest[]
 
   @@map("services")
 }
@@ -81,13 +82,50 @@ model Availability {
   id        String             @id @default(cuid())
   userId    String
   date      DateTime
+  startTime String?
+  endTime   String?
   status    AvailabilityStatus @default(AVAILABLE)
+  notes     String?
+  serviceId String?
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
   user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  service   Service?           @relation(fields: [serviceId], references: [id])
 
   @@unique([userId, date])
   @@map("availability")
+}
+
+model SwapRequest {
+  id         String   @id @default(cuid())
+  fromUserId String
+  toUserId   String
+  serviceId  String
+  date       DateTime
+  message    String?
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  fromUser   User     @relation("SwapRequestFrom", fields: [fromUserId], references: [id])
+  service    Service  @relation(fields: [serviceId], references: [id])
+  toUser     User     @relation("SwapRequestTo", fields: [toUserId], references: [id])
+
+  @@map("swap_requests")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  data      Json?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }
 
 enum UserRole {
@@ -111,40 +149,4 @@ enum AvailabilityStatus {
   AVAILABLE
   UNAVAILABLE
   BUSY
-}
-
-model SwapRequest {
-  id          String   @id @default(cuid())
-  fromUserId  String
-  toUserId    String
-  serviceId   String
-  date        DateTime
-  message     String?
-  status      String   @default("pending") // pending, accepted, rejected
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  fromUser User    @relation("SwapRequestFrom", fields: [fromUserId], references: [id])
-  toUser   User    @relation("SwapRequestTo", fields: [toUserId], references: [id])
-  service  Service @relation(fields: [serviceId], references: [id])
-
-  @@map("swap_requests")
-}
-
-model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  type      String   // swap_request, service_update, etc.
-  title     String
-  message   String
-  data      Json?    // Additional data for the notification
-  read      Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("notifications")
 }

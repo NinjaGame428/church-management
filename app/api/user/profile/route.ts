@@ -1,6 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+export async function GET(request: NextRequest) {
+  try {
+    const userId = request.nextUrl.searchParams.get('userId')
+    
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'User ID is required' },
+        { status: 401 }
+      )
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { church: true }
+    })
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      )
+    }
+
+    // Return user data without password
+    const userData = {
+      id: user.id,
+      email: user.email,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone,
+      department: user.department,
+      position: user.position,
+      bio: user.bio,
+      avatar: user.avatar,
+      role: user.role,
+      churchId: user.churchId || undefined,
+      churchName: user.church?.name
+    }
+
+    return NextResponse.json(userData)
+  } catch (error) {
+    console.error('Get user profile error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function PUT(request: NextRequest) {
   try {
     const { 
