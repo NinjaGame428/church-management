@@ -82,7 +82,7 @@ const Footer = () => {
               ChurchManager
             </Link>
             . Tous droits réservés. Réalisé par{" "}
-            <Link href="https://heavenkeys.com" target="_blank" className="text-primary hover:underline">
+            <Link href="https://heavenkeys.ca" target="_blank" className="text-primary hover:underline">
               Heavenkeys LTD
             </Link>
             .
