@@ -141,7 +141,16 @@ async function main() {
 
   // Create default service roles
   const defaultRoles = [
-      // New service roles
+    { name: 'Louange', description: 'Responsable de la louange et du chant', color: '#8B5CF6' },
+    { name: 'Son', description: 'Responsable de la technique sonore', color: '#06B6D4' },
+    { name: 'Accueil', description: 'Responsable de l\'accueil des fidèles', color: '#10B981' },
+    { name: 'Lecture', description: 'Responsable des lectures bibliques', color: '#F59E0B' },
+    { name: 'Prédication', description: 'Responsable de la prédication', color: '#EF4444' },
+    { name: 'Prière', description: 'Responsable des moments de prière', color: '#3B82F6' },
+    { name: 'Communion', description: 'Responsable de la communion', color: '#8B5CF6' },
+    { name: 'Offrande', description: 'Responsable de la collecte d\'offrandes', color: '#F59E0B' },
+    { name: 'Intervenant', description: 'Participant général au service', color: '#6B7280' },
+    // New service roles
     { name: 'Prière des stars', description: 'Responsable de la prière des stars', color: '#A855F7' },
     { name: 'Introduction du culte', description: 'Responsable de l\'introduction du culte', color: '#EC4899' },
     { name: 'Modérateur/Modératrice', description: 'Responsable de la modération du service', color: '#F97316' },

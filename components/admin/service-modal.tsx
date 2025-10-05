@@ -147,10 +147,7 @@ export default function ServiceModal({
       const response = await fetch('/api/admin/roles');
       if (response.ok) {
         const data = await response.json();
-        console.log('Loaded roles:', data);
-        const activeRoles = data.filter((role: any) => role.isActive);
-        console.log('Active roles:', activeRoles);
-        setRoles(activeRoles);
+        setRoles(data.filter((role: any) => role.isActive));
       }
     } catch (error) {
       console.error('Error loading roles:', error);
