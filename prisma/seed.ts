@@ -149,7 +149,15 @@ async function main() {
     { name: 'Prière', description: 'Responsable des moments de prière', color: '#3B82F6' },
     { name: 'Communion', description: 'Responsable de la communion', color: '#8B5CF6' },
     { name: 'Offrande', description: 'Responsable de la collecte d\'offrandes', color: '#F59E0B' },
-    { name: 'Intervenant', description: 'Participant général au service', color: '#6B7280' }
+    { name: 'Intervenant', description: 'Participant général au service', color: '#6B7280' },
+    // New service roles
+    { name: 'Prière des stars', description: 'Responsable de la prière des stars', color: '#A855F7' },
+    { name: 'Introduction du culte', description: 'Responsable de l\'introduction du culte', color: '#EC4899' },
+    { name: 'Modérateur/Modératrice', description: 'Responsable de la modération du service', color: '#F97316' },
+    { name: 'Exhortation des offrandes', description: 'Responsable de l\'exhortation des offrandes', color: '#84CC16' },
+    { name: 'Accueil des nouveaux', description: 'Responsable de l\'accueil des nouveaux membres', color: '#22C55E' },
+    { name: 'Conducteur de prière', description: 'Responsable de la conduite de la prière', color: '#3B82F6' },
+    { name: 'Enseignement', description: 'Responsable de l\'enseignement biblique', color: '#6366F1' }
   ]
 
   for (const roleData of defaultRoles) {
