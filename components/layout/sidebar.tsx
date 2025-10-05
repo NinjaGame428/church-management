@@ -147,7 +147,10 @@ export default function Sidebar({ user, onLogout }: SidebarProps) {
     if (onLogout) {
       onLogout();
     } else {
-      window.location.href = "/login";
+      // Clear user data and redirect to homepage
+      localStorage.removeItem('churchUser');
+      localStorage.removeItem('auth-token');
+      window.location.href = "/";
     }
   };
 

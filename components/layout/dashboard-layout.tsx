@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import Sidebar from "./sidebar";
@@ -18,9 +18,8 @@ export default function DashboardLayout({
   title, 
   description 
 }: DashboardLayoutProps) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, logout } = useAuth();
   const router = useRouter();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Redirect if not logged in
   useEffect(() => {
@@ -29,17 +28,8 @@ export default function DashboardLayout({
     }
   }, [user, isLoading, router]);
 
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    try {
-      // Clear any stored auth data
-      localStorage.removeItem('auth-token');
-      // Redirect to login
-      window.location.href = '/login';
-    } catch (error) {
-      console.error('Logout error:', error);
-      setIsLoggingOut(false);
-    }
+  const handleLogout = () => {
+    logout();
   };
 
   if (isLoading) {

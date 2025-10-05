@@ -76,6 +76,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     setUser(null);
     localStorage.removeItem('churchUser');
+    localStorage.removeItem('auth-token');
+    // Redirect to homepage after logout
+    window.location.href = '/';
   };
 
   const updateUser = (userData: Partial<User>) => {
