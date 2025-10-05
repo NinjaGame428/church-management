@@ -14,7 +14,9 @@ import {
   Users,
   Palette,
   Save,
-  X
+  X,
+  Upload,
+  FileText
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 
@@ -35,7 +37,9 @@ export default function AdminRoles() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showBulkModal, setShowBulkModal] = useState(false);
   const [editingRole, setEditingRole] = useState<ServiceRole | null>(null);
+  const [bulkRolesText, setBulkRolesText] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -52,8 +56,6 @@ export default function AdminRoles() {
       const response = await fetch('/api/admin/roles');
       if (response.ok) {
         const data = await response.json();
-        console.log('Roles loaded in admin page:', data.length, 'roles');
-        console.log('Role names in admin page:', data.map(r => r.name));
         setRoles(data);
       } else {
         setError('Erreur lors du chargement des rôles');
@@ -157,6 +159,68 @@ export default function AdminRoles() {
     }
   };
 
+  const handleBulkUpload = async () => {
+    if (!bulkRolesText.trim()) {
+      setError('Veuillez entrer des rôles à importer');
+      return;
+    }
+
+    try {
+      // Parse the bulk text - expecting format: "Role Name|Description|Color"
+      const lines = bulkRolesText.split('\n').filter(line => line.trim());
+      const rolesToCreate = [];
+
+      for (const line of lines) {
+        const parts = line.split('|');
+        if (parts.length >= 1) {
+          const name = parts[0].trim();
+          const description = parts[1]?.trim() || '';
+          const color = parts[2]?.trim() || '#3B82F6';
+          
+          if (name) {
+            rolesToCreate.push({ name, description, color });
+          }
+        }
+      }
+
+      if (rolesToCreate.length === 0) {
+        setError('Aucun rôle valide trouvé dans le texte');
+        return;
+      }
+
+      // Create roles one by one
+      let successCount = 0;
+      let errorCount = 0;
+
+      for (const roleData of rolesToCreate) {
+        try {
+          const response = await fetch('/api/admin/roles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(roleData)
+          });
+
+          if (response.ok) {
+            successCount++;
+          } else {
+            errorCount++;
+          }
+        } catch (error) {
+          errorCount++;
+        }
+      }
+
+      setMessage(`${successCount} rôles créés avec succès${errorCount > 0 ? `, ${errorCount} erreurs` : ''}`);
+      setShowBulkModal(false);
+      setBulkRolesText('');
+      loadRoles();
+      setTimeout(() => setMessage(''), 5000);
+    } catch (error) {
+      console.error('Bulk upload error:', error);
+      setError('Erreur lors de l\'importation des rôles');
+    }
+  };
+
   const filteredRoles = roles.filter(role =>
     role.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (role.description && role.description.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -205,10 +269,16 @@ export default function AdminRoles() {
               />
             </div>
           </div>
-          <Button onClick={handleCreateRole}>
-            <Plus className="h-4 w-4 mr-2" />
-            Créer un rôle
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setShowBulkModal(true)}>
+              <Upload className="h-4 w-4 mr-2" />
+              Import en masse
+            </Button>
+            <Button onClick={handleCreateRole}>
+              <Plus className="h-4 w-4 mr-2" />
+              Créer un rôle
+            </Button>
+          </div>
         </div>
 
         {/* Roles List */}
@@ -355,6 +425,64 @@ export default function AdminRoles() {
                   </Button>
                 </div>
               </form>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Bulk Upload Modal */}
+      {showBulkModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="w-full max-w-2xl mx-4">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Import en masse des rôles</CardTitle>
+                  <CardDescription>
+                    Importez plusieurs rôles à la fois. Format: Nom du rôle|Description|Couleur (une ligne par rôle)
+                  </CardDescription>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setShowBulkModal(false)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {error && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{error}</p>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <Label htmlFor="bulkRoles">Rôles à importer</Label>
+                  <Textarea
+                    id="bulkRoles"
+                    value={bulkRolesText}
+                    onChange={(e) => setBulkRolesText(e.target.value)}
+                    placeholder={`Exemple:
+Louange|Responsable de la louange et du chant|#8B5CF6
+Son|Responsable de la technique sonore|#06B6D4
+Accueil|Responsable de l'accueil des fidèles|#10B981`}
+                    rows={8}
+                    className="font-mono text-sm"
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Format: Nom du rôle|Description|Couleur (optionnel, défaut: #3B82F6)
+                  </p>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button type="button" variant="outline" onClick={() => setShowBulkModal(false)}>
+                    Annuler
+                  </Button>
+                  <Button onClick={handleBulkUpload}>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Importer les rôles
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
