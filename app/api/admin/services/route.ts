@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const service = await prisma.$transaction(async (tx) => {
+    const service = await prisma.$transaction(async (tx: any) => {
       // Create the service
       const newService = await tx.service.create({
         data: {
