@@ -30,7 +30,7 @@ export async function PUT(
 
     // Check if role name already exists (excluding current role)
     const existingRole = await prisma.serviceRole.findFirst({
-      where: { 
+      where: {
         name,
         id: { not: id }
       }
