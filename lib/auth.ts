@@ -6,6 +6,11 @@ export interface User {
   email: string
   firstName: string
   lastName: string
+  phone?: string
+  department?: string
+  position?: string
+  bio?: string
+  avatar?: string
   role: 'ADMIN' | 'USER'
   churchId?: string
   churchName?: string
@@ -38,6 +43,11 @@ export async function authenticateUser(email: string, password: string): Promise
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      phone: user.phone || undefined,
+      department: user.department || undefined,
+      position: user.position || undefined,
+      bio: user.bio || undefined,
+      avatar: user.avatar || undefined,
       role: user.role,
       churchId: user.churchId || undefined,
       churchName: user.church?.name
@@ -119,6 +129,11 @@ export async function getUserById(id: string): Promise<User | null> {
       email: user.email,
       firstName: user.firstName,
       lastName: user.lastName,
+      phone: user.phone || undefined,
+      department: user.department || undefined,
+      position: user.position || undefined,
+      bio: user.bio || undefined,
+      avatar: user.avatar || undefined,
       role: user.role,
       churchId: user.churchId || undefined,
       churchName: user.church?.name

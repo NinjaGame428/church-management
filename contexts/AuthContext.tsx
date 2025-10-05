@@ -7,6 +7,11 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
+  phone?: string;
+  department?: string;
+  position?: string;
+  bio?: string;
+  avatar?: string;
   role: 'ADMIN' | 'USER';
   churchId?: string;
   churchName?: string;

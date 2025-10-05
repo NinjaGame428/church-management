@@ -62,9 +62,11 @@ export default function UserDashboard() {
                 <Bell className="h-4 w-4 mr-2" />
                 Notifications
               </Button>
-              <Button variant="outline" size="sm">
-                <Settings className="h-4 w-4 mr-2" />
-                Paramètres
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/user/settings">
+                  <Settings className="h-4 w-4 mr-2" />
+                  Paramètres
+                </Link>
               </Button>
               <Button variant="outline" size="sm" onClick={handleLogout} disabled={isLoading}>
                 <LogOut className="h-4 w-4 mr-2" />
