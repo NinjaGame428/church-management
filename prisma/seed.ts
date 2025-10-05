@@ -139,7 +139,9 @@ async function main() {
     }
   })
 
-  // Create default service roles
+  // Create default service roles (commented out to avoid demo data)
+  // Uncomment the following lines if you want to create default roles
+  /*
   const defaultRoles = [
     { name: 'Louange', description: 'Responsable de la louange et du chant', color: '#8B5CF6' },
     { name: 'Son', description: 'Responsable de la technique sonore', color: '#06B6D4' },
@@ -167,6 +169,7 @@ async function main() {
       create: roleData
     })
   }
+  */
 
   console.log('✅ Database seeded successfully!')
   console.log('👤 Admin user: admin@church.com / admin123')
