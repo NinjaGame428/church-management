@@ -34,7 +34,6 @@ export async function PUT(
         name,
         id: { not: id }
       }
-      }
     })
 
     if (existingRole) {
