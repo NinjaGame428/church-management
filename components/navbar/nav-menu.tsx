@@ -20,11 +20,6 @@ export const NavMenu = (props: NavigationMenuProps) => (
           <Link href="#dashboards">Tableaux de Bord</Link>
         </NavigationMenuLink>
       </NavigationMenuItem>
-      <NavigationMenuItem>
-        <NavigationMenuLink asChild>
-          <Link href="#testimonials">Témoignages</Link>
-        </NavigationMenuLink>
-      </NavigationMenuItem>
     </NavigationMenuList>
   </NavigationMenu>
 );
