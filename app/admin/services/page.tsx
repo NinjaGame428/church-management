@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import ServiceModal from "@/components/admin/service-modal";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Service {
   id: string;
@@ -58,6 +59,7 @@ interface ServiceFormData {
 }
 
 export default function AdminServices() {
+  const { user } = useAuth();
   const [services, setServices] = useState<Service[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -380,7 +382,7 @@ export default function AdminServices() {
         }}
         onSave={handleSaveService}
         service={editingService}
-        currentUser={user}
+        currentUser={user || undefined}
       />
     </DashboardLayout>
   );
