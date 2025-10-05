@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { Geist } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
+import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -104,7 +105,10 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
             <NotificationProvider>
-              <TooltipProvider>{children}</TooltipProvider>
+              <TooltipProvider>
+                {children}
+                <Toaster />
+              </TooltipProvider>
             </NotificationProvider>
           </AuthProvider>
         </ThemeProvider>

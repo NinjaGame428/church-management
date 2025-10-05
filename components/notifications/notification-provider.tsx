@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/components/ui/use-toast';
 
 interface Notification {
   id: string;
@@ -29,6 +30,7 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const { user } = useAuth();
+  const { toast } = useToast();
 
   // Load notifications on mount and when user changes
   useEffect(() => {
@@ -47,8 +49,24 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
       const response = await fetch(`/api/notifications?userId=${user.id}`);
       if (response.ok) {
         const data = await response.json();
+        const previousCount = notifications.length;
         setNotifications(data);
-        setUnreadCount(data.filter((n: Notification) => !n.read).length);
+        const newUnreadCount = data.filter((n: Notification) => !n.read).length;
+        setUnreadCount(newUnreadCount);
+
+        // Show toast for new notifications
+        if (data.length > previousCount) {
+          const newNotifications = data.slice(0, data.length - previousCount);
+          newNotifications.forEach((notification: Notification) => {
+            if (!notification.read) {
+              toast({
+                title: notification.title,
+                description: notification.message,
+                variant: notification.type === 'service_assignment' ? 'success' : 'default'
+              });
+            }
+          });
+        }
       }
     } catch (error) {
       console.error('Error loading notifications:', error);

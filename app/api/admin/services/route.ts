@@ -64,43 +64,67 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const service = await prisma.service.create({
-      data: {
-        title,
-        description,
-        date: new Date(date),
-        time,
-        location,
-        status: status as 'DRAFT' | 'PUBLISHED' | 'CANCELLED',
-        churchId: church.id,
-        assignments: {
-          create: assignments.map((assignment: { userId: string; role: string }) => ({
-            userId: assignment.userId,
-            role: assignment.role,
-            status: 'PENDING'
-          }))
-        }
-      },
-      include: {
-        church: {
-          select: {
-            id: true,
-            name: true
+    const service = await prisma.$transaction(async (tx) => {
+      // Create the service
+      const newService = await tx.service.create({
+        data: {
+          title,
+          description,
+          date: new Date(date),
+          time,
+          location,
+          status: status as 'DRAFT' | 'PUBLISHED' | 'CANCELLED',
+          churchId: church.id,
+          assignments: {
+            create: assignments.map((assignment: { userId: string }) => ({
+              userId: assignment.userId,
+              role: 'Intervenant',
+              status: 'PENDING'
+            }))
           }
         },
-        assignments: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                firstName: true,
-                lastName: true
+        include: {
+          church: {
+            select: {
+              id: true,
+              name: true
+            }
+          },
+          assignments: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true
+                }
               }
             }
           }
         }
+      });
+
+      // Create notifications for assigned users
+      if (assignments.length > 0) {
+        await tx.notification.createMany({
+          data: assignments.map((assignment: { userId: string }) => ({
+            userId: assignment.userId,
+            type: 'service_assignment',
+            title: 'Nouveau service assigné',
+            message: `Vous avez été assigné au service "${title}" le ${new Date(date).toLocaleDateString('fr-FR')} à ${time}`,
+            data: {
+              serviceId: newService.id,
+              serviceTitle: title,
+              date: date,
+              time: time,
+              location: location
+            }
+          }))
+        });
       }
-    })
+
+      return newService;
+    });
 
     return NextResponse.json(service)
   } catch (error) {

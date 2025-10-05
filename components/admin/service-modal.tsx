@@ -33,7 +33,6 @@ interface User {
 
 interface UserAssignment {
   userId: string;
-  role: string;
 }
 
 interface Church {
@@ -49,7 +48,7 @@ interface ServiceFormData {
   time: string;
   location: string;
   status: 'DRAFT' | 'PUBLISHED' | 'CANCELLED';
-  assignments?: { userId: string; role: string }[];
+  assignments?: { userId: string }[];
 }
 
 interface ServiceModalProps {
@@ -76,8 +75,7 @@ export default function ServiceModal({
   const [users, setUsers] = useState<User[]>([]);
   const [assignments, setAssignments] = useState<UserAssignment[]>([]);
   const [newAssignment, setNewAssignment] = useState({
-    userId: '',
-    role: ''
+    userId: ''
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -95,8 +93,7 @@ export default function ServiceModal({
       // Convert existing assignments to the new format
       if (service.assignments) {
         setAssignments(service.assignments.map((assignment: any) => ({
-          userId: assignment.user.id,
-          role: assignment.role
+          userId: assignment.user.id
         })));
       }
     } else {
@@ -157,7 +154,7 @@ export default function ServiceModal({
   };
 
   const handleAddAssignment = () => {
-    if (newAssignment.userId && newAssignment.role) {
+    if (newAssignment.userId) {
       // Check if user is already assigned
       const isAlreadyAssigned = assignments.some(assignment => assignment.userId === newAssignment.userId);
       if (isAlreadyAssigned) {
@@ -166,7 +163,7 @@ export default function ServiceModal({
       }
 
       setAssignments(prev => [...prev, { ...newAssignment }]);
-      setNewAssignment({ userId: '', role: '' });
+      setNewAssignment({ userId: '' });
       setError('');
     }
   };
@@ -292,7 +289,7 @@ export default function ServiceModal({
               </div>
 
               {/* Add New Assignment */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
                 <div className="space-y-2">
                   <Label htmlFor="userSelect">Sélectionner un utilisateur</Label>
                   <Select 
@@ -312,36 +309,15 @@ export default function ServiceModal({
                   </Select>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="roleSelect">Rôle</Label>
-                  <Select 
-                    value={newAssignment.role} 
-                    onValueChange={(value) => setNewAssignment(prev => ({ ...prev, role: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Choisir un rôle" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Prédicateur">Prédicateur</SelectItem>
-                      <SelectItem value="Musicien">Musicien</SelectItem>
-                      <SelectItem value="Chantre">Chantre</SelectItem>
-                      <SelectItem value="Accueil">Accueil</SelectItem>
-                      <SelectItem value="Technique">Technique</SelectItem>
-                      <SelectItem value="Enfants">Enfants</SelectItem>
-                      <SelectItem value="Autre">Autre</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
                 <div className="flex items-end">
                   <Button 
                     type="button" 
                     onClick={handleAddAssignment}
-                    disabled={!newAssignment.userId || !newAssignment.role}
+                    disabled={!newAssignment.userId}
                     className="w-full"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Ajouter
+                    Assigner au service
                   </Button>
                 </div>
               </div>
@@ -361,9 +337,9 @@ export default function ServiceModal({
                               <span className="font-medium">
                                 {user ? `${user.firstName} ${user.lastName}` : 'Utilisateur inconnu'}
                               </span>
-                              <Badge variant="secondary" className="ml-2">
-                                {assignment.role}
-                              </Badge>
+                              <span className="text-sm text-muted-foreground ml-2">
+                                ({user?.email})
+                              </span>
                             </div>
                           </div>
                           <Button

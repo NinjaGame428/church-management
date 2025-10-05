@@ -47,7 +47,7 @@ export async function PUT(
     }
 
     // Full service update
-    const service = await prisma.$transaction(async (tx) => {
+    const service = await prisma.$transaction(async (tx: any) => {
       // Delete existing assignments
       await tx.serviceAssignment.deleteMany({
         where: { serviceId: params.id }
@@ -64,9 +64,9 @@ export async function PUT(
           location,
           status: status as 'DRAFT' | 'PUBLISHED' | 'CANCELLED',
           assignments: {
-            create: assignments.map((assignment: { userId: string; role: string }) => ({
+            create: assignments.map((assignment: { userId: string }) => ({
               userId: assignment.userId,
-              role: assignment.role,
+              role: 'Intervenant',
               status: 'PENDING'
             }))
           }
@@ -91,6 +91,25 @@ export async function PUT(
           }
         }
       })
+
+      // Create notifications for newly assigned users
+      if (assignments.length > 0) {
+        await tx.notification.createMany({
+          data: assignments.map((assignment: { userId: string }) => ({
+            userId: assignment.userId,
+            type: 'service_assignment',
+            title: 'Service mis à jour',
+            message: `Vous avez été assigné au service "${title}" le ${new Date(date).toLocaleDateString('fr-FR')} à ${time}`,
+            data: {
+              serviceId: updatedService.id,
+              serviceTitle: title,
+              date: date,
+              time: time,
+              location: location
+            }
+          }))
+        });
+      }
 
       return updatedService
     })

@@ -54,7 +54,7 @@ interface ServiceFormData {
   time: string;
   location: string;
   status: 'DRAFT' | 'PUBLISHED' | 'CANCELLED';
-  assignments?: { userId: string; role: string }[];
+  assignments?: { userId: string }[];
 }
 
 export default function AdminServices() {
