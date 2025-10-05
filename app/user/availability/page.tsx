@@ -159,6 +159,15 @@ export default function AvailabilityPage() {
     }
   };
 
+  const handleDateClick = (date: Date) => {
+    const dateString = date.toISOString().split('T')[0];
+    setFormData(prev => ({
+      ...prev,
+      date: dateString
+    }));
+    setShowAddForm(true);
+  };
+
   const handleEdit = (availability: Availability) => {
     setFormData({
       date: availability.date,
@@ -286,9 +295,31 @@ export default function AvailabilityPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Calendar View */}
+          <div className="lg:col-span-1">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Calendrier
+                </CardTitle>
+                <CardDescription>
+                  Cliquez sur une date pour ajouter votre disponibilité
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8 text-muted-foreground">
+                  <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Calendrier interactif</p>
+                  <p className="text-sm">Cliquez sur une date pour ajouter votre disponibilité</p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           {/* Availability Management */}
-          <div className="space-y-6">
+          <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardHeader>
                 <div className="flex justify-between items-center">

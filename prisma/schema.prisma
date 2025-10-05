@@ -27,6 +27,7 @@ model User {
   church       Church?             @relation(fields: [churchId], references: [id])
   swapRequestsFrom SwapRequest[]   @relation("SwapRequestFrom")
   swapRequestsTo   SwapRequest[]   @relation("SwapRequestTo")
+  notifications Notification[]
 
   @@map("users")
 }
@@ -129,4 +130,21 @@ model SwapRequest {
   service  Service @relation(fields: [serviceId], references: [id])
 
   @@map("swap_requests")
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // swap_request, service_update, etc.
+  title     String
+  message   String
+  data      Json?    // Additional data for the notification
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }
