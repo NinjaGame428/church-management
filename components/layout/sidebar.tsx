@@ -64,6 +64,12 @@ const getNavigationItems = (unreadCount: number) => [
     badge: null
   },
   {
+    title: "Échanges",
+    href: "/user/swap",
+    icon: RefreshCw,
+    badge: null
+  },
+  {
     title: "Notifications",
     href: "/user/notifications",
     icon: Bell,

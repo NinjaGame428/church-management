@@ -16,9 +16,9 @@ import {
   Edit,
   Trash2
 } from "lucide-react";
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AvailabilityCalendar from "@/components/calendar/availability-calendar";
 import DashboardLayout from "@/components/layout/dashboard-layout";
@@ -304,13 +304,23 @@ export default function AvailabilityPage() {
           <div className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <RefreshCw className="h-5 w-5" />
-                  Demandes d'Échange
-                </CardTitle>
-                <CardDescription>
-                  Gérez vos demandes d'échange de services
-                </CardDescription>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <RefreshCw className="h-5 w-5" />
+                      Demandes d'Échange
+                    </CardTitle>
+                    <CardDescription>
+                      Gérez vos demandes d'échange de services
+                    </CardDescription>
+                  </div>
+                  <Button asChild>
+                    <Link href="/user/swap">
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Nouvelle Demande
+                    </Link>
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 {swapRequests.length === 0 ? (
@@ -341,11 +351,17 @@ export default function AvailabilityPage() {
                             <p className="text-sm text-muted-foreground">
                               {new Date(request.date).toLocaleDateString('fr-FR')}
                             </p>
+                            <p className="text-sm text-muted-foreground">
+                              {request.fromUserId === user?.id ? 
+                                `Vers: ${request.toUser.firstName} ${request.toUser.lastName}` :
+                                `De: ${request.fromUser.firstName} ${request.fromUser.lastName}`
+                              }
+                            </p>
                             {request.message && (
                               <p className="text-sm text-muted-foreground mt-1">{request.message}</p>
                             )}
                           </div>
-                          {request.status === 'pending' && (
+                          {request.status === 'pending' && request.fromUserId !== user?.id && (
                             <div className="flex gap-2">
                               <Button 
                                 size="sm" 
