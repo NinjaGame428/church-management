@@ -14,56 +14,60 @@ import { CircleCheck, CircleHelp } from "lucide-react";
 import { useState } from "react";
 
 const tooltipContent = {
-  styles: "Choose from a variety of styles to suit your preferences.",
-  filters: "Choose from a variety of filters to enhance your portraits.",
-  credits: "Use these credits to retouch your portraits.",
+  services: "Nombre maximum de services que vous pouvez créer par mois.",
+  users: "Nombre d'intervenants qui peuvent utiliser la plateforme.",
+  support: "Niveau de support technique disponible.",
+  storage: "Espace de stockage pour vos données et documents.",
 };
 
 const YEARLY_DISCOUNT = 20;
 const plans = [
   {
-    name: "Starter",
-    price: 20,
+    name: "Débutant",
+    price: 0,
     description:
-      "Get 20 AI-generated portraits with 2 unique styles and filters.",
+      "Parfait pour les petites églises qui commencent leur digitalisation.",
     features: [
-      { title: "5 hours turnaround time" },
-      { title: "20 AI portraits" },
-      { title: "Choice of 2 styles", tooltip: tooltipContent.styles },
-      { title: "Choice of 2 filters", tooltip: tooltipContent.filters },
-      { title: "2 retouch credits", tooltip: tooltipContent.credits },
+      { title: "Jusqu'à 5 services par mois" },
+      { title: "Jusqu'à 20 intervenants" },
+      { title: "Calendrier de base" },
+      { title: "Notifications email" },
+      { title: "Support par email" },
     ],
-    buttonText: "Get 20 portraits in 5 hours",
+    buttonText: "Commencer Gratuitement",
   },
   {
-    name: "Advanced",
-    price: 40,
+    name: "Professionnel",
+    price: 29,
     isRecommended: true,
     description:
-      "Get 50 AI-generated portraits with 5 unique styles and filters.",
+      "Idéal pour les églises moyennes avec une équipe active.",
     features: [
-      { title: "3 hours turnaround time" },
-      { title: "50 AI portraits" },
-      { title: "Choice of 5 styles", tooltip: tooltipContent.styles },
-      { title: "Choice of 5 filters", tooltip: tooltipContent.filters },
-      { title: "5 retouch credits", tooltip: tooltipContent.credits },
+      { title: "Services illimités" },
+      { title: "Jusqu'à 100 intervenants" },
+      { title: "Toutes les fonctionnalités MVP" },
+      { title: "Notifications avancées" },
+      { title: "Support prioritaire" },
+      { title: "Formation en ligne" },
     ],
-    buttonText: "Get 50 portraits in 3 hours",
+    buttonText: "Essayer 14 jours",
     isPopular: true,
   },
   {
-    name: "Premium",
-    price: 80,
+    name: "Église",
+    price: 59,
     description:
-      "Get 100 AI-generated portraits with 10 unique styles and filters.",
+      "Pour les grandes églises avec plusieurs départements.",
     features: [
-      { title: "1-hour turnaround time" },
-      { title: "100 AI portraits" },
-      { title: "Choice of 10 styles", tooltip: tooltipContent.styles },
-      { title: "Choice of 10 filters", tooltip: tooltipContent.filters },
-      { title: "10 retouch credits", tooltip: tooltipContent.credits },
+      { title: "Tout du plan Professionnel" },
+      { title: "Intervenants illimités" },
+      { title: "Multi-départements" },
+      { title: "Rapports avancés" },
+      { title: "Support téléphonique" },
+      { title: "Formation personnalisée" },
+      { title: "Intégrations calendrier" },
     ],
-    buttonText: "Get 100 portraits in 1 hour",
+    buttonText: "Contacter les Ventes",
   },
 ];
 
@@ -76,8 +80,11 @@ const Pricing = () => {
       className="flex flex-col items-center justify-center py-12 xs:py-20 px-6"
     >
       <h1 className="text-3xl xs:text-4xl md:text-5xl font-bold text-center tracking-tight">
-        Pricing
+        Tarifs
       </h1>
+      <p className="mt-4 text-lg text-muted-foreground text-center max-w-2xl">
+        Choisissez le plan qui correspond à la taille de votre église
+      </p>
       <Tabs
         value={selectedBillingPeriod}
         onValueChange={setSelectedBillingPeriod}
@@ -85,10 +92,10 @@ const Pricing = () => {
       >
         <TabsList className="h-11 px-1.5 rounded-full bg-primary/5">
           <TabsTrigger value="monthly" className="py-1.5 rounded-full">
-            Monthly
+            Mensuel
           </TabsTrigger>
           <TabsTrigger value="yearly" className="py-1.5 rounded-full">
-            Yearly (Save {YEARLY_DISCOUNT}%)
+            Annuel (Économisez {YEARLY_DISCOUNT}%)
           </TabsTrigger>
         </TabsList>
       </Tabs>
@@ -102,18 +109,24 @@ const Pricing = () => {
           >
             {plan.isPopular && (
               <Badge className="absolute top-0 right-1/2 translate-x-1/2 -translate-y-1/2">
-                Most Popular
+                Plus Populaire
               </Badge>
             )}
             <h3 className="text-lg font-medium">{plan.name}</h3>
             <p className="mt-2 text-4xl font-bold">
-              $
-              {selectedBillingPeriod === "monthly"
-                ? plan.price
-                : plan.price * ((100 - YEARLY_DISCOUNT) / 100)}
-              <span className="ml-1.5 text-sm text-muted-foreground font-normal">
-                /month
-              </span>
+              {plan.price === 0 ? (
+                "Gratuit"
+              ) : (
+                <>
+                  {selectedBillingPeriod === "monthly"
+                    ? plan.price
+                    : Math.round(plan.price * ((100 - YEARLY_DISCOUNT) / 100))}
+                  €
+                  <span className="ml-1.5 text-sm text-muted-foreground font-normal">
+                    /mois
+                  </span>
+                </>
+              )}
             </p>
             <p className="mt-4 font-medium text-muted-foreground">
               {plan.description}

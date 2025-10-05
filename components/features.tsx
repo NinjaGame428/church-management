@@ -1,73 +1,113 @@
 import {
-  Blocks,
-  Bot,
-  ChartPie,
-  Film,
-  MessageCircle,
-  Settings2,
+  Calendar,
+  Users,
+  UserCheck,
+  Clock,
+  User,
+  Shield,
+  Bell,
+  Smartphone,
 } from "lucide-react";
 import React from "react";
 
 const features = [
   {
-    icon: Settings2,
-    title: "Customizable Layouts",
+    icon: Calendar,
+    title: "Gestion des Services/Quarts",
     description:
-      "Design your space with drag-and-drop simplicity—create grids, lists, or galleries in seconds.",
+      "Créez des services (dimanche matin, mercredi soir, etc.) avec date, heure, lieu et rôles nécessaires. Modifiez et supprimez facilement.",
+    priority: "⭐⭐⭐",
   },
   {
-    icon: Blocks,
-    title: "Interactive Widgets",
+    icon: Calendar,
+    title: "Calendrier Visuel",
     description:
-      "Embed polls, quizzes, or forms to keep your audience engaged.",
+      "Vue hebdomadaire et mensuelle avec codage couleur par département. Navigation simple entre les dates.",
+    priority: "⭐⭐⭐",
   },
   {
-    icon: Bot,
-    title: "AI-Powered Tools",
+    icon: Users,
+    title: "Attribution des Intervenants",
     description:
-      "Generate summaries, auto-format content, or translate into multiple languages seamlessly.",
+      "Glisser-déposer des intervenants vers les services. Détection de conflits et gestion des attributions.",
+    priority: "⭐⭐⭐",
   },
   {
-    icon: Film,
-    title: "Media Integrations",
+    icon: UserCheck,
+    title: "Gestion de Disponibilité",
     description:
-      "Connect with Spotify, Instagram, or your own media library for dynamic visuals and sound.",
+      "Les intervenants marquent leurs disponibilités. Dates indisponibles (vacances) avec indicateurs visuels.",
+    priority: "⭐⭐⭐",
   },
   {
-    icon: ChartPie,
-    title: "Advanced Analytics",
+    icon: User,
+    title: "Profils Intervenants",
     description:
-      "Track engagement, clicks, and user activity with intuitive charts and reports.",
+      "Nom, prénom, email, téléphone, départements (louange, son, enfants), compétences et contact d'urgence.",
+    priority: "⭐⭐",
   },
   {
-    icon: MessageCircle,
-    title: "Seamless Collaboration",
+    icon: Shield,
+    title: "Contrôle d'Accès",
     description:
-      "Comment, tag, and assign tasks directly within your documents.",
+      "Admin : Peut tout gérer. Intervenant : Voit son horaire, met à jour sa disponibilité. Connexion sécurisée.",
+    priority: "⭐⭐⭐",
+  },
+  {
+    icon: Bell,
+    title: "Notifications de Base",
+    description:
+      "Notification quand assigné à un service, quand l'horaire est publié, et rappel 24h avant le service.",
+    priority: "⭐⭐",
+  },
+  {
+    icon: Smartphone,
+    title: "Interface Mobile Responsive",
+    description:
+      "Fonctionne parfaitement sur smartphone avec tableau de bord simple et navigation tactile facile.",
+    priority: "⭐⭐⭐",
   },
 ];
 
 const Features = () => {
   return (
     <div id="features" className="w-full py-12 xs:py-20 px-6">
-      <h2 className="text-3xl xs:text-4xl sm:text-5xl font-bold tracking-tight text-center">
-        Unleash Your Creativity
-      </h2>
-      <div className="w-full max-w-screen-lg mx-auto mt-10 sm:mt-16 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="text-center mb-16">
+        <h2 className="text-3xl xs:text-4xl sm:text-5xl font-bold tracking-tight">
+          Les 8 Fonctionnalités Essentielles
+        </h2>
+        <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+          Notre MVP comprend toutes les fonctionnalités indispensables pour une gestion efficace de vos services d'église
+        </p>
+      </div>
+      
+      <div className="w-full max-w-screen-xl mx-auto grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {features.map((feature) => (
           <div
             key={feature.title}
-            className="flex flex-col bg-background border rounded-xl py-6 px-5"
+            className="flex flex-col bg-background border rounded-xl py-6 px-5 hover:shadow-lg transition-shadow"
           >
-            <div className="mb-3 h-10 w-10 flex items-center justify-center bg-muted rounded-full">
-              <feature.icon className="h-6 w-6" />
+            <div className="flex items-center justify-between mb-3">
+              <div className="h-10 w-10 flex items-center justify-center bg-primary/10 rounded-full">
+                <feature.icon className="h-6 w-6 text-primary" />
+              </div>
+              <span className="text-sm font-medium text-primary">{feature.priority}</span>
             </div>
-            <span className="text-lg font-semibold">{feature.title}</span>
-            <p className="mt-1 text-foreground/80 text-[15px]">
+            <span className="text-lg font-semibold mb-2">{feature.title}</span>
+            <p className="text-foreground/80 text-[15px] leading-relaxed">
               {feature.description}
             </p>
           </div>
         ))}
+      </div>
+      
+      {/* Nice to have section */}
+      <div className="mt-20 text-center">
+        <h3 className="text-2xl font-bold mb-4">Fonctionnalités "Nice to Have" (Phase 2)</h3>
+        <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+          À ajouter après le MVP : Publication automatisée, échange de quarts, intégration calendrier, 
+          pointage, rapports et tableau d'annonces.
+        </p>
       </div>
     </div>
   );
