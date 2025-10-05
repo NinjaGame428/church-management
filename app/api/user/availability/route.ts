@@ -52,11 +52,13 @@ export async function POST(request: NextRequest) {
       userId,
       date, 
       status, 
+      startTime,
+      endTime,
       notes, 
       serviceId 
     } = await request.json()
 
-    console.log('Creating availability with data:', { userId, date, status, notes, serviceId })
+    console.log('Creating availability with data:', { userId, date, status, startTime, endTime, notes, serviceId })
 
     if (!userId) {
       return NextResponse.json(
@@ -76,8 +78,8 @@ export async function POST(request: NextRequest) {
       data: {
         userId,
         date: new Date(date),
-        startTime: '09:00', // Default start time
-        endTime: '17:00',   // Default end time
+        startTime: startTime || '09:00',
+        endTime: endTime || '17:00',
         status: status.toUpperCase() as 'AVAILABLE' | 'UNAVAILABLE' | 'BUSY',
         notes,
         serviceId: serviceId || null

@@ -103,6 +103,8 @@ export default function AvailabilityPage() {
   const handleAddAvailability = async (data: {
     date: string;
     status: 'available' | 'unavailable' | 'busy';
+    startTime: string;
+    endTime: string;
     notes?: string;
   }) => {
     setError('');
@@ -138,6 +140,8 @@ export default function AvailabilityPage() {
   const handleEditAvailability = async (id: string, data: {
     date: string;
     status: 'available' | 'unavailable' | 'busy';
+    startTime: string;
+    endTime: string;
     notes?: string;
   }) => {
     setError('');

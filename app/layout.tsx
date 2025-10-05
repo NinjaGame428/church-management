@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Geist } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { NotificationProvider } from "@/components/notifications/notification-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -102,7 +103,9 @@ export default function RootLayout({
       <body className={`${geistSans.className} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
-            <TooltipProvider>{children}</TooltipProvider>
+            <NotificationProvider>
+              <TooltipProvider>{children}</TooltipProvider>
+            </NotificationProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>

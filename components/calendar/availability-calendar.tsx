@@ -36,11 +36,15 @@ interface AvailabilityCalendarProps {
   onAddAvailability: (data: {
     date: string;
     status: 'available' | 'unavailable' | 'busy';
+    startTime: string;
+    endTime: string;
     notes?: string;
   }) => Promise<void>;
   onEditAvailability: (id: string, data: {
     date: string;
     status: 'available' | 'unavailable' | 'busy';
+    startTime: string;
+    endTime: string;
     notes?: string;
   }) => Promise<void>;
   onDeleteAvailability: (id: string) => Promise<void>;
@@ -58,8 +62,19 @@ export default function AvailabilityCalendar({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     status: 'available' as 'available' | 'unavailable' | 'busy',
+    startTime: '09:00',
+    endTime: '17:00',
     notes: ''
   });
+
+  // Predefined time slots
+  const timeSlots = [
+    '06:00', '06:30', '07:00', '07:30', '08:00', '08:30', '09:00', '09:30',
+    '10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30',
+    '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30',
+    '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30',
+    '22:00', '22:30', '23:00', '23:30'
+  ];
 
   const monthStart = startOfMonth(currentDate);
   const monthEnd = endOfMonth(currentDate);
@@ -83,6 +98,8 @@ export default function AvailabilityCalendar({
     setEditingId(null);
     setFormData({
       status: 'available',
+      startTime: '09:00',
+      endTime: '17:00',
       notes: ''
     });
   };
@@ -92,6 +109,8 @@ export default function AvailabilityCalendar({
     setEditingId(availability.id);
     setFormData({
       status: availability.status,
+      startTime: availability.startTime,
+      endTime: availability.endTime,
       notes: availability.notes || ''
     });
     setShowAddForm(true);
@@ -105,6 +124,8 @@ export default function AvailabilityCalendar({
     const availabilityData = {
       date: dateString,
       status: formData.status,
+      startTime: formData.startTime,
+      endTime: formData.endTime,
       notes: formData.notes
     };
     
@@ -119,6 +140,8 @@ export default function AvailabilityCalendar({
       setEditingId(null);
       setFormData({
         status: 'available',
+        startTime: '09:00',
+        endTime: '17:00',
         notes: ''
       });
     } catch (error) {
@@ -299,6 +322,46 @@ export default function AvailabilityCalendar({
                 </Select>
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="startTime">Heure de début</Label>
+                  <Select 
+                    value={formData.startTime} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, startTime: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner l'heure de début" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {timeSlots.map((time) => (
+                        <SelectItem key={time} value={time}>
+                          {time}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="endTime">Heure de fin</Label>
+                  <Select 
+                    value={formData.endTime} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, endTime: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner l'heure de fin" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {timeSlots.map((time) => (
+                        <SelectItem key={time} value={time}>
+                          {time}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="notes">Notes (optionnel)</Label>
                 <Textarea
@@ -323,6 +386,8 @@ export default function AvailabilityCalendar({
                     setEditingId(null);
                     setFormData({
                       status: 'available',
+                      startTime: '09:00',
+                      endTime: '17:00',
                       notes: ''
                     });
                   }}

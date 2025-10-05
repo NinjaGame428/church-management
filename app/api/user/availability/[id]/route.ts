@@ -10,6 +10,8 @@ export async function PUT(
       userId,
       date, 
       status, 
+      startTime,
+      endTime,
       notes, 
       serviceId 
     } = await request.json()
@@ -28,8 +30,8 @@ export async function PUT(
       },
       data: {
         date: new Date(date),
-        startTime: '09:00', // Default start time
-        endTime: '17:00',   // Default end time
+        startTime: startTime || '09:00',
+        endTime: endTime || '17:00',
         status: status.toUpperCase() as 'AVAILABLE' | 'UNAVAILABLE' | 'BUSY',
         notes,
         serviceId: serviceId || null
