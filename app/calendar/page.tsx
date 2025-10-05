@@ -43,19 +43,12 @@ export default function CalendarPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
 
-  // Redirect if not logged in
-  useEffect(() => {
-    if (!isLoading && !user) {
-      router.push('/login');
-    }
-  }, [user, isLoading, router]);
+  // Calendar is visible to all users - no authentication required
 
-  // Load schedules
+  // Load schedules for all users
   useEffect(() => {
-    if (user) {
-      loadSchedules();
-    }
-  }, [user]);
+    loadSchedules();
+  }, []);
 
   const loadSchedules = async () => {
     try {
@@ -83,7 +76,10 @@ export default function CalendarPage() {
   };
 
   const handleSwapRequest = async (targetUserId: string) => {
-    if (!selectedService || !user) return;
+    if (!selectedService || !user) {
+      alert('Vous devez être connecté pour demander un échange');
+      return;
+    }
 
     try {
       const response = await fetch('/api/user/swap-requests', {
@@ -146,10 +142,6 @@ export default function CalendarPage() {
     );
   }
 
-  if (!user) {
-    return null; // Will redirect to login
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="max-w-7xl mx-auto">
@@ -161,18 +153,37 @@ export default function CalendarPage() {
               <p className="text-muted-foreground">Consultez les services programmés et gérez vos disponibilités</p>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="outline" asChild>
-                <Link href="/user/availability">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Ma Disponibilité
-                </Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link href="/user/dashboard">
-                  <User className="h-4 w-4 mr-2" />
-                  Mon Tableau de Bord
-                </Link>
-              </Button>
+              {user ? (
+                <>
+                  <Button variant="outline" asChild>
+                    <Link href="/user/availability">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Ma Disponibilité
+                    </Link>
+                  </Button>
+                  <Button variant="outline" asChild>
+                    <Link href="/user/dashboard">
+                      <User className="h-4 w-4 mr-2" />
+                      Mon Tableau de Bord
+                    </Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" asChild>
+                    <Link href="/login">
+                      <User className="h-4 w-4 mr-2" />
+                      Se Connecter
+                    </Link>
+                  </Button>
+                  <Button asChild>
+                    <Link href="/signup">
+                      <Plus className="h-4 w-4 mr-2" />
+                      S'inscrire
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
