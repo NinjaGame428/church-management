@@ -268,18 +268,6 @@ export default function SignupPage() {
           </CardContent>
         </Card>
 
-        {/* Benefits */}
-        <Card className="mt-4 bg-green-50 border-green-200">
-          <CardContent className="pt-4">
-            <h4 className="font-medium text-sm text-green-900 mb-2">Avantages de ChurchManager</h4>
-            <ul className="space-y-1 text-xs text-green-700">
-              <li>• Planification simplifiée des services</li>
-              <li>• Gestion des intervenants en temps réel</li>
-              <li>• Interface mobile optimisée</li>
-              <li>• Notifications automatiques</li>
-            </ul>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
