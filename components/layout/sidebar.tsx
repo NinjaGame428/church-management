@@ -47,6 +47,12 @@ const getNavigationItems = (unreadCount: number) => [
     badge: null
   },
   {
+    title: "Calendrier",
+    href: "/calendar",
+    icon: Calendar,
+    badge: null
+  },
+  {
     title: "Ma Disponibilité",
     href: "/user/availability",
     icon: Clock,
@@ -94,6 +100,12 @@ const adminNavigationItems = [
   {
     title: "Services",
     href: "/admin/services",
+    icon: Calendar,
+    badge: null
+  },
+  {
+    title: "Calendrier",
+    href: "/admin/calendar",
     icon: Calendar,
     badge: null
   },
