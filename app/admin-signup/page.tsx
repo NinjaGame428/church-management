@@ -27,8 +27,6 @@ export default function AdminSignupPage() {
       lastName: formData.get('lastName') as string,
       phone: formData.get('phone') as string,
       role: 'ADMIN', // Admin registration
-      churchName: formData.get('churchName') as string,
-      churchAddress: formData.get('churchAddress') as string,
     };
 
     try {
@@ -119,30 +117,6 @@ export default function AdminSignupPage() {
                 </div>
               </div>
 
-              {/* Church Information */}
-              <div className="space-y-2">
-                <Label htmlFor="churchName">Nom de l'église *</Label>
-                <div className="relative">
-                  <Building className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="churchName"
-                    name="churchName"
-                    type="text"
-                    placeholder="Impact Centre Chrétien"
-                    className="pl-10"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="churchAddress">Adresse de l'église</Label>
-                <Input
-                  id="churchAddress"
-                  name="churchAddress"
-                  type="text"
-                  placeholder="123 Rue de la Paix, 75001 Paris"
-                />
-              </div>
 
               {/* Contact Information */}
               <div className="space-y-2">
