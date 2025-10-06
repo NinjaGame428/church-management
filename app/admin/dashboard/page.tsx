@@ -14,8 +14,23 @@ import {
   BarChart3
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/dashboard-layout";
+import { useRouter } from "next/navigation";
 
 export default function AdminDashboard() {
+  const router = useRouter();
+
+  const handleCreateService = () => {
+    router.push('/admin/services');
+  };
+
+  const handleAddUser = () => {
+    router.push('/admin/users');
+  };
+
+  const handleScheduleServices = () => {
+    router.push('/admin/calendar');
+  };
+
   return (
     <DashboardLayout 
       title="Tableau d'Administration"
@@ -82,15 +97,15 @@ export default function AdminDashboard() {
               <CardDescription>Gérez vos services et intervenants</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
-              <Button className="w-full justify-start">
+              <Button className="w-full justify-start" onClick={handleCreateService}>
                 <Plus className="h-4 w-4 mr-2" />
                 Créer un nouveau service
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={handleAddUser}>
                 <UserPlus className="h-4 w-4 mr-2" />
                 Ajouter un intervenant
               </Button>
-              <Button variant="outline" className="w-full justify-start">
+              <Button variant="outline" className="w-full justify-start" onClick={handleScheduleServices}>
                 <Calendar className="h-4 w-4 mr-2" />
                 Planifier les services
               </Button>
