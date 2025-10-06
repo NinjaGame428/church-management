@@ -14,8 +14,7 @@ import {
   Clock, 
   User, 
   Plus,
-  RefreshCw,
-  Bell
+  RefreshCw
 } from "lucide-react";
 import Link from "next/link";
 
@@ -43,6 +42,10 @@ export default function CalendarPage() {
   const [selectedService, setSelectedService] = useState<ServiceSchedule | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [stats, setStats] = useState({
+    servicesThisMonth: 0,
+    activeUsers: 0
+  });
 
   // Calendar is visible to all users - no authentication required
 
@@ -58,6 +61,24 @@ export default function CalendarPage() {
       if (response.ok) {
         const data = await response.json();
         setSchedules(data);
+        
+        // Calculate real statistics
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+        
+        const servicesThisMonth = data.filter((service: ServiceSchedule) => {
+          const serviceDate = new Date(service.date);
+          return serviceDate.getMonth() === currentMonth && 
+                 serviceDate.getFullYear() === currentYear;
+        }).length;
+        
+        const activeUsers = new Set(data.flatMap((s: ServiceSchedule) => s.users.map(u => u.id))).size;
+        
+        setStats({
+          servicesThisMonth,
+          activeUsers
+        });
       }
     } catch (error) {
       console.error('Error loading schedules:', error);
@@ -181,13 +202,11 @@ export default function CalendarPage() {
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Services ce mois</span>
-                  <Badge variant="secondary">{schedules.length}</Badge>
+                  <Badge variant="secondary">{stats.servicesThisMonth}</Badge>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground">Intervenants actifs</span>
-                  <Badge variant="secondary">
-                    {new Set(schedules.flatMap(s => s.users.map(u => u.id))).size}
-                  </Badge>
+                  <Badge variant="secondary">{stats.activeUsers}</Badge>
                 </div>
               </CardContent>
             </Card>
@@ -222,23 +241,6 @@ export default function CalendarPage() {
               </CardContent>
             </Card>
 
-            {/* Notifications */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Bell className="h-4 w-4" />
-                  Notifications
-                </CardTitle>
-                <CardDescription>Dernières activités</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="text-sm text-muted-foreground">
-                    Les notifications d'échange apparaîtront ici
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
         </div>
 
