@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createUser } from '@/lib/auth'
+import { emailService } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -47,6 +48,20 @@ export async function POST(request: NextRequest) {
       churchName,
       churchAddress
     })
+
+    // Send welcome email
+    try {
+      await emailService.sendWelcomeEmail({
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        role: user.role
+      });
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+      // Don't fail registration if email fails
+    }
 
     return NextResponse.json(user, { status: 201 })
   } catch (error: any) {

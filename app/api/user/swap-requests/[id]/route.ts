@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { emailService } from '@/lib/email'
 
 export async function PUT(
   request: NextRequest,
@@ -38,7 +39,10 @@ export async function PUT(
         service: {
           select: {
             id: true,
-            title: true
+            title: true,
+            date: true,
+            time: true,
+            location: true
           }
         }
       }
@@ -107,6 +111,61 @@ export async function PUT(
           }
         ]
       })
+
+      // Send email notifications for approved swap
+      try {
+        await emailService.sendSwapApprovedEmail(
+          swapRequest.fromUser,
+          swapRequest.toUser,
+          {
+            id: swapRequest.service.id,
+            title: swapRequest.service.title,
+            date: swapRequest.service.date,
+            time: swapRequest.service.time,
+            location: swapRequest.service.location,
+            status: 'PUBLISHED'
+          }
+        );
+      } catch (emailError) {
+        console.error('Failed to send swap approved email:', emailError);
+      }
+    }
+
+    // Send email notifications for accepted/rejected swap requests
+    if (status === 'accepted') {
+      try {
+        await emailService.sendSwapAcceptedEmail(
+          swapRequest.fromUser,
+          swapRequest.toUser,
+          {
+            id: swapRequest.service.id,
+            title: swapRequest.service.title,
+            date: swapRequest.service.date,
+            time: swapRequest.service.time,
+            location: swapRequest.service.location,
+            status: 'PUBLISHED'
+          }
+        );
+      } catch (emailError) {
+        console.error('Failed to send swap accepted email:', emailError);
+      }
+    } else if (status === 'rejected') {
+      try {
+        await emailService.sendSwapRejectedEmail(
+          swapRequest.fromUser,
+          swapRequest.toUser,
+          {
+            id: swapRequest.service.id,
+            title: swapRequest.service.title,
+            date: swapRequest.service.date,
+            time: swapRequest.service.time,
+            location: swapRequest.service.location,
+            status: 'PUBLISHED'
+          }
+        );
+      } catch (emailError) {
+        console.error('Failed to send swap rejected email:', emailError);
+      }
     }
 
     return NextResponse.json({

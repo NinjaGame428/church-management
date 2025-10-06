@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { emailService } from '@/lib/email'
 
 export async function GET(request: NextRequest) {
   try {
@@ -122,6 +123,35 @@ export async function POST(request: NextRequest) {
             }
           }))
         });
+
+        // Send email notifications to assigned users
+        for (const assignment of assignments) {
+          try {
+            const user = await tx.user.findUnique({
+              where: { id: assignment.userId },
+              select: { id: true, firstName: true, lastName: true, email: true }
+            });
+
+            if (user) {
+              await emailService.sendServiceAssignmentEmail(
+                user,
+                {
+                  id: newService.id,
+                  title: newService.title,
+                  description: newService.description,
+                  date: newService.date,
+                  time: newService.time,
+                  location: newService.location,
+                  status: newService.status
+                },
+                assignment.role || 'Intervenant'
+              );
+            }
+          } catch (emailError) {
+            console.error('Failed to send service assignment email:', emailError);
+            // Don't fail the transaction if email fails
+          }
+        }
       }
 
       return newService;

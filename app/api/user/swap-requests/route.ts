@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { emailService } from '@/lib/email'
 
 export async function GET(request: NextRequest) {
   try {
@@ -148,11 +149,34 @@ export async function POST(request: NextRequest) {
         service: {
           select: {
             id: true,
-            title: true
+            title: true,
+            date: true,
+            time: true,
+            location: true
           }
         }
       }
     })
+
+    // Send email notification to the target user
+    try {
+      await emailService.sendSwapRequestEmail(
+        swapRequest.fromUser,
+        swapRequest.toUser,
+        {
+          id: swapRequest.service.id,
+          title: swapRequest.service.title,
+          date: swapRequest.service.date,
+          time: swapRequest.service.time,
+          location: swapRequest.service.location,
+          status: 'PUBLISHED'
+        },
+        message
+      );
+    } catch (emailError) {
+      console.error('Failed to send swap request email:', emailError);
+      // Don't fail the request if email fails
+    }
 
     return NextResponse.json({
       id: swapRequest.id,

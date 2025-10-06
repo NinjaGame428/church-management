@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { emailService } from '@/lib/email'
 
 export async function GET(request: NextRequest) {
   try {
@@ -95,6 +96,26 @@ export async function POST(request: NextRequest) {
     })
 
     console.log('Availability created successfully:', availability.id)
+
+    // Send email notification for availability change
+    try {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, firstName: true, lastName: true, email: true }
+      });
+
+      if (user) {
+        await emailService.sendAvailabilityChangedEmail(
+          user,
+          date,
+          status.toLowerCase(),
+          notes
+        );
+      }
+    } catch (emailError) {
+      console.error('Failed to send availability change email:', emailError);
+      // Don't fail the request if email fails
+    }
 
     return NextResponse.json({
       id: availability.id,

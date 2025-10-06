@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { emailService } from '@/lib/email'
 
 export async function PUT(
   request: NextRequest,
@@ -72,6 +73,31 @@ export async function PUT(
           }
         }
       })
+
+      // Send email notification for declined services
+      if (status === 'DECLINED' && reason) {
+        try {
+          await emailService.sendServiceDeclinedEmail(
+            {
+              id: assignment.userId,
+              firstName: assignment.user.firstName,
+              lastName: assignment.user.lastName,
+              email: assignment.user.email
+            },
+            {
+              id: assignment.serviceId,
+              title: assignment.service.title,
+              date: assignment.service.date,
+              time: '', // We don't have time in this context
+              location: '', // We don't have location in this context
+              status: 'PUBLISHED'
+            },
+            reason
+          );
+        } catch (emailError) {
+          console.error('Failed to send service declined email:', emailError);
+        }
+      }
     }
 
     return NextResponse.json(assignment)
