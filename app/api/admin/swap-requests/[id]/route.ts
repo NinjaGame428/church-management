@@ -3,10 +3,11 @@ import { prisma } from '@/lib/prisma'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { status } = await request.json()
+    const { id } = await params
 
     if (!['admin_approved', 'admin_rejected'].includes(status)) {
       return NextResponse.json(
@@ -16,7 +17,7 @@ export async function PUT(
     }
 
     const swapRequest = await prisma.swapRequest.update({
-      where: { id: params.id },
+      where: { id },
       data: { status: status as 'admin_approved' | 'admin_rejected' },
       include: {
         fromUser: {

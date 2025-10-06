@@ -120,7 +120,12 @@ export default function AvailabilityCalendar({
     e.preventDefault();
     if (!selectedDate) return;
 
-    const dateString = selectedDate.toISOString().split('T')[0];
+    // Ensure we're using the correct date without timezone issues
+    const year = selectedDate.getFullYear();
+    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDate.getDate()).padStart(2, '0');
+    const dateString = `${year}-${month}-${day}`;
+    
     const availabilityData = {
       date: dateString,
       status: formData.status,

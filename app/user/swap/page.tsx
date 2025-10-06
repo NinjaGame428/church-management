@@ -111,24 +111,16 @@ export default function SwapPage() {
 
   const loadAvailableUsers = async (serviceId: string, date: string) => {
     try {
-      const response = await fetch('/api/user/swap-requests', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fromUserId: user?.id,
-          serviceId,
-          date
-        }),
-      });
-
+      // Load all users instead of just available ones
+      const response = await fetch('/api/admin/users');
       if (response.ok) {
         const data = await response.json();
-        setAvailableUsers(data.availableUsers || []);
+        // Filter out the current user and only show regular users
+        const otherUsers = data.filter((u: any) => u.id !== user?.id && u.role === 'USER');
+        setAvailableUsers(otherUsers);
       }
     } catch (error) {
-      console.error('Error loading available users:', error);
+      console.error('Error loading users:', error);
     }
   };
 
@@ -291,7 +283,10 @@ export default function SwapPage() {
 
               {selectedService && (
                 <div className="space-y-2">
-                  <Label htmlFor="user">Utilisateur disponible</Label>
+                  <Label htmlFor="user">Utilisateur pour l'échange</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Sélectionnez un utilisateur pour demander un échange. Note: Vérifiez la disponibilité de l'utilisateur avant d'envoyer la demande.
+                  </p>
                   <div className="space-y-2">
                     <Input
                       placeholder="Rechercher un utilisateur..."
@@ -310,6 +305,9 @@ export default function SwapPage() {
                               <div>
                                 <div className="font-medium">{user.firstName} {user.lastName}</div>
                                 <div className="text-sm text-muted-foreground">{user.email}</div>
+                                {user.department && (
+                                  <div className="text-xs text-muted-foreground">{user.department}</div>
+                                )}
                               </div>
                             </div>
                           </SelectItem>

@@ -87,13 +87,22 @@ export async function POST(request: NextRequest) {
 
     // Find available users for the service
     if (!toUserId) {
+      // Validate and parse the date
+      const serviceDate = new Date(date);
+      if (isNaN(serviceDate.getTime())) {
+        return NextResponse.json(
+          { error: 'Invalid date format' },
+          { status: 400 }
+        )
+      }
+
       const availableUsers = await prisma.user.findMany({
         where: {
           role: 'USER',
           id: { not: fromUserId },
           availability: {
             some: {
-              date: new Date(date),
+              date: serviceDate,
               status: 'available'
             }
           }
@@ -102,7 +111,8 @@ export async function POST(request: NextRequest) {
           id: true,
           firstName: true,
           lastName: true,
-          email: true
+          email: true,
+          department: true
         }
       })
 
