@@ -3,42 +3,45 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpRight, Calendar, Users, Shield } from "lucide-react";
 import React from "react";
 import LogoCloud from "./logo-cloud";
+import { useLanguage } from "@/contexts/LanguageContext";
 import Link from "next/link";
 
 const Hero = () => {
+  const { t } = useLanguage();
+  
   return (
-    <div className="min-h-[calc(100vh-6rem)] flex flex-col items-center py-20 px-6">
+    <div className="min-h-[calc(100vh-6rem)] flex flex-col items-center py-12 sm:py-20 px-4 sm:px-6">
       <div className="md:mt-6 flex items-center justify-center">
         <div className="text-center max-w-2xl">
-          <Badge className="bg-primary rounded-full py-1 border-none">
-            MVP Version Available! ⭐
+          <Badge className="bg-primary rounded-full py-1 border-none text-xs sm:text-sm">
+            {t('common.success')} Version Disponible! ⭐
           </Badge>
-          <h1 className="mt-6 max-w-[20ch] text-3xl xs:text-4xl sm:text-5xl md:text-6xl font-bold !leading-[1.2] tracking-tight">
-            Gestion Intelligente des Services d'Église
+          <h1 className="mt-4 sm:mt-6 max-w-[20ch] text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold !leading-[1.2] tracking-tight">
+            Impact Intervenant
           </h1>
-          <p className="mt-6 max-w-[60ch] xs:text-lg">
-            Simplifiez la planification de vos services avec notre plateforme complète. 
+          <p className="mt-4 sm:mt-6 text-sm sm:text-base lg:text-lg max-w-[60ch] mx-auto">
+            {t('dashboard.welcome')} au système de gestion des modérateurs. 
             Gérez les intervenants, planifiez les services et coordonnez votre équipe 
             en toute simplicité.
           </p>
-          <div className="mt-12 flex flex-col sm:flex-row items-center sm:justify-center gap-4">
+          <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-center sm:justify-center gap-3 sm:gap-4">
             <Button
               size="lg"
-              className="w-full sm:w-auto rounded-full text-base"
+              className="w-full sm:w-auto rounded-full text-sm sm:text-base"
               asChild
             >
               <Link href="/signup">
-                Commencer <ArrowUpRight className="!h-5 !w-5" />
+                {t('auth.createAccount')} <ArrowUpRight className="!h-4 !w-4 sm:!h-5 sm:!w-5" />
               </Link>
             </Button>
             <Button
               variant="outline"
               size="lg"
-              className="w-full sm:w-auto rounded-full text-base shadow-none"
+              className="w-full sm:w-auto rounded-full text-sm sm:text-base shadow-none"
               asChild
             >
               <Link href="#dashboards">
-                <Calendar className="!h-5 !w-5" /> Voir le Calendrier
+                <Calendar className="!h-4 !w-4 sm:!h-5 sm:!w-5" /> {t('calendar.title')}
               </Link>
             </Button>
           </div>
@@ -46,26 +49,26 @@ const Hero = () => {
       </div>
       
       {/* Feature highlights */}
-      <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-        <div className="text-center p-6 bg-background border rounded-xl">
-          <Calendar className="h-8 w-8 mx-auto mb-4 text-primary" />
-          <h3 className="font-semibold mb-2">Planification Simple</h3>
-          <p className="text-sm text-muted-foreground">
-            Créez et gérez vos services en quelques clics
+      <div className="mt-12 sm:mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto">
+        <div className="text-center p-4 sm:p-6 bg-background border rounded-xl">
+          <Calendar className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-3 sm:mb-4 text-primary" />
+          <h3 className="font-semibold mb-2 text-sm sm:text-base">{t('services.title')}</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            {t('services.createService')} en quelques clics
           </p>
         </div>
-        <div className="text-center p-6 bg-background border rounded-xl">
-          <Users className="h-8 w-8 mx-auto mb-4 text-primary" />
-          <h3 className="font-semibold mb-2">Gestion des Intervenants</h3>
-          <p className="text-sm text-muted-foreground">
-            Assignez facilement les bonnes personnes aux bons services
+        <div className="text-center p-4 sm:p-6 bg-background border rounded-xl">
+          <Users className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-3 sm:mb-4 text-primary" />
+          <h3 className="font-semibold mb-2 text-sm sm:text-base">{t('users.title')}</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            {t('users.userManagement')} efficace
           </p>
         </div>
-        <div className="text-center p-6 bg-background border rounded-xl">
-          <Shield className="h-8 w-8 mx-auto mb-4 text-primary" />
-          <h3 className="font-semibold mb-2">Sécurité & Accès</h3>
-          <p className="text-sm text-muted-foreground">
-            Contrôle d'accès sécurisé pour administrateurs et intervenants
+        <div className="text-center p-4 sm:p-6 bg-background border rounded-xl sm:col-span-2 lg:col-span-1">
+          <Shield className="h-6 w-6 sm:h-8 sm:w-8 mx-auto mb-3 sm:mb-4 text-primary" />
+          <h3 className="font-semibold mb-2 text-sm sm:text-base">{t('users.admin')}</h3>
+          <p className="text-xs sm:text-sm text-muted-foreground">
+            {t('users.userManagement')} sécurisé
           </p>
         </div>
       </div>

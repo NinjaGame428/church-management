@@ -13,47 +13,47 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "ChurchManager - Gestion Intelligente des Services d'Église",
+  title: "Impact Intervenant - Système de gestion des modérateurs",
   description:
-    "Simplifiez la planification de vos services avec notre plateforme complète. Gérez les intervenants, planifiez les services et coordonnez votre équipe en toute simplicité.",
+    "Plateforme complète de gestion des modérateurs et intervenants. Gérez les services, planifiez les interventions et coordonnez votre équipe en toute simplicité.",
   keywords: [
-    "ChurchManager",
-    "Gestion Église",
-    "Services Église",
+    "Impact Intervenant",
+    "Gestion Modérateurs",
+    "Système Gestion",
+    "Intervenants",
+    "Modérateurs",
     "Planification Services",
-    "Intervenants Église",
-    "Calendrier Église",
-    "Organisation Église",
-    "Gestion Intervenants",
-    "Planning Services",
-    "Église Digitale",
-    "Outils Église",
-    "Administration Église",
+    "Gestion Équipe",
+    "Calendrier",
+    "Organisation",
+    "Administration",
+    "Plateforme Digitale",
+    "Outils Gestion"
   ],
   openGraph: {
     type: "website",
-    siteName: "PureLanding",
-    locale: "en_US",
-    url: "https://shadcn-landing-page.vercel.app",
-    title: "PureLanding - Beautiful Shadcn UI Landing Page",
+    siteName: "Impact Intervenant",
+    locale: "fr_FR",
+    url: "https://impact-intervenant.vercel.app",
+    title: "Impact Intervenant - Système de gestion des modérateurs",
     description:
-      "A beautiful landing page built with Shadcn UI, Next.js 15, Tailwind CSS, and Shadcn UI Blocks.",
+      "Plateforme complète de gestion des modérateurs et intervenants pour une organisation optimale de vos services.",
     images: [
       {
         url: "/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "PureLanding Preview",
+        alt: "Impact Intervenant - Système de gestion des modérateurs",
       },
     ],
   },
   authors: [
     {
-      name: "Akash Moradiya",
-      url: "https://shadcnui-blocks.com",
+      name: "Impact Intervenant",
+      url: "https://impact-intervenant.vercel.app",
     },
   ],
-  creator: "Akash Moradiya",
+  creator: "Impact Intervenant",
   icons: [
     {
       rel: "icon",

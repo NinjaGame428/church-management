@@ -13,36 +13,41 @@ import {
   Smartphone
 } from "lucide-react";
 import React from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const DashboardPreview = () => {
+  const { t } = useLanguage();
+  
   return (
-    <div id="dashboards" className="w-full py-12 xs:py-20 px-6 bg-muted/30">
+    <div id="dashboards" className="w-full py-8 sm:py-12 lg:py-20 px-4 sm:px-6 bg-muted/30">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl xs:text-4xl sm:text-5xl font-bold tracking-tight">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold tracking-tight">
             Tableaux de Bord Intuitifs
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="mt-3 sm:mt-4 text-sm sm:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto">
             Deux interfaces optimisées : une pour les administrateurs et une pour les intervenants
           </p>
         </div>
 
         <Tabs defaultValue="admin" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="admin" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Tableau Admin
+          <TabsList className="grid w-full grid-cols-2 mb-6 sm:mb-8">
+            <TabsTrigger value="admin" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Tableau Admin</span>
+              <span className="sm:hidden">Admin</span>
             </TabsTrigger>
-            <TabsTrigger value="user" className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Tableau Intervenant
+            <TabsTrigger value="user" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+              <User className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Tableau Intervenant</span>
+              <span className="sm:hidden">User</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="admin" className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+          <TabsContent value="admin" className="space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
               {/* Admin Dashboard Preview */}
-              <div className="bg-background border rounded-xl p-6">
+              <div className="bg-background border rounded-xl p-4 sm:p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold">Vue d'ensemble Admin</h3>
                   <Badge variant="secondary">Administrateur</Badge>
@@ -191,12 +196,12 @@ const DashboardPreview = () => {
         </Tabs>
 
         {/* Mobile Responsive Note */}
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full">
-            <Smartphone className="h-4 w-4" />
-            <span className="text-sm font-medium">Interface 100% Mobile Responsive</span>
+        <div className="mt-8 sm:mt-12 text-center">
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 sm:px-4 py-2 rounded-full">
+            <Smartphone className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="text-xs sm:text-sm font-medium">Interface 100% Mobile Responsive</span>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-2 text-xs sm:text-sm text-muted-foreground">
             Optimisé pour smartphone avec navigation tactile intuitive
           </p>
         </div>

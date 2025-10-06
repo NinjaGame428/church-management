@@ -1,5 +1,7 @@
+import Link from "next/link";
+
 export const Logo = () => (
-  <div className="flex items-center gap-2">
+  <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
     <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
       <svg
         width="20"
@@ -19,6 +21,6 @@ export const Logo = () => (
         />
       </svg>
     </div>
-    <span className="text-xl font-bold">ChurchManager</span>
-  </div>
+    <span className="text-xl font-bold">Impact Intervenant</span>
+  </Link>
 );
