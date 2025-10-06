@@ -13,7 +13,10 @@ import {
   AlertCircle,
   UserPlus,
   BarChart3,
-  RefreshCw
+  RefreshCw,
+  Mail,
+  Settings,
+  Send
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import { useRouter } from "next/navigation";
@@ -57,6 +60,16 @@ export default function AdminDashboard() {
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [upcomingServices, setUpcomingServices] = useState<UpcomingService[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [emailSettings, setEmailSettings] = useState({
+    smtpHost: '',
+    smtpPort: '',
+    smtpUser: '',
+    smtpPass: '',
+    fromEmail: '',
+    fromName: ''
+  });
+  const [isEmailLoading, setIsEmailLoading] = useState(false);
+  const [emailMessage, setEmailMessage] = useState('');
 
   useEffect(() => {
     loadDashboardData();
@@ -86,10 +99,78 @@ export default function AdminDashboard() {
         const servicesData = await servicesResponse.json();
         setUpcomingServices(servicesData);
       }
+
+      // Load email settings
+      loadEmailSettings();
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadEmailSettings = async () => {
+    try {
+      const response = await fetch('/api/admin/email-settings');
+      if (response.ok) {
+        const settings = await response.json();
+        setEmailSettings(settings);
+      }
+    } catch (error) {
+      console.error('Error loading email settings:', error);
+    }
+  };
+
+  const handleEmailSettingsSave = async () => {
+    try {
+      setIsEmailLoading(true);
+      setEmailMessage('');
+      
+      const response = await fetch('/api/admin/email-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(emailSettings),
+      });
+
+      if (response.ok) {
+        setEmailMessage('Paramètres email sauvegardés avec succès!');
+      } else {
+        const error = await response.json();
+        setEmailMessage(`Erreur: ${error.error || 'Impossible de sauvegarder les paramètres'}`);
+      }
+    } catch (error) {
+      console.error('Error saving email settings:', error);
+      setEmailMessage('Erreur lors de la sauvegarde des paramètres');
+    } finally {
+      setIsEmailLoading(false);
+    }
+  };
+
+  const handleTestEmail = async () => {
+    try {
+      setIsEmailLoading(true);
+      setEmailMessage('');
+      
+      const response = await fetch('/api/admin/test-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        setEmailMessage('Email de test envoyé avec succès!');
+      } else {
+        const error = await response.json();
+        setEmailMessage(`Erreur: ${error.error || 'Impossible d\'envoyer l\'email de test'}`);
+      }
+    } catch (error) {
+      console.error('Error sending test email:', error);
+      setEmailMessage('Erreur lors de l\'envoi de l\'email de test');
+    } finally {
+      setIsEmailLoading(false);
     }
   };
 
@@ -302,6 +383,137 @@ export default function AdminDashboard() {
                 ))}
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Email Settings */}
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="h-5 w-5" />
+                  Paramètres Email
+                </CardTitle>
+                <CardDescription>Configuration des notifications email</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={loadEmailSettings}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Actualiser
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {emailMessage && (
+              <div className={`mb-4 p-3 rounded-lg ${
+                emailMessage.includes('succès') ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+              }`}>
+                <p className={`text-sm ${
+                  emailMessage.includes('succès') ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {emailMessage}
+                </p>
+              </div>
+            )}
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Serveur SMTP</label>
+                <input
+                  type="text"
+                  value={emailSettings.smtpHost}
+                  onChange={(e) => setEmailSettings({...emailSettings, smtpHost: e.target.value})}
+                  placeholder="smtp.gmail.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Port SMTP</label>
+                <input
+                  type="number"
+                  value={emailSettings.smtpPort}
+                  onChange={(e) => setEmailSettings({...emailSettings, smtpPort: e.target.value})}
+                  placeholder="587"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Email d'envoi</label>
+                <input
+                  type="email"
+                  value={emailSettings.smtpUser}
+                  onChange={(e) => setEmailSettings({...emailSettings, smtpUser: e.target.value})}
+                  placeholder="votre@email.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Mot de passe</label>
+                <input
+                  type="password"
+                  value={emailSettings.smtpPass}
+                  onChange={(e) => setEmailSettings({...emailSettings, smtpPass: e.target.value})}
+                  placeholder="••••••••"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Nom d'expéditeur</label>
+                <input
+                  type="text"
+                  value={emailSettings.fromName}
+                  onChange={(e) => setEmailSettings({...emailSettings, fromName: e.target.value})}
+                  placeholder="Impact Centre Chrétien"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Email d'expéditeur</label>
+                <input
+                  type="email"
+                  value={emailSettings.fromEmail}
+                  onChange={(e) => setEmailSettings({...emailSettings, fromEmail: e.target.value})}
+                  placeholder="noreply@impactcentrechretien.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            
+            <div className="flex gap-3 mt-6">
+              <Button 
+                onClick={handleEmailSettingsSave}
+                disabled={isEmailLoading}
+                className="flex items-center gap-2"
+              >
+                <Settings className="h-4 w-4" />
+                {isEmailLoading ? 'Sauvegarde...' : 'Sauvegarder'}
+              </Button>
+              
+              <Button 
+                variant="outline"
+                onClick={handleTestEmail}
+                disabled={isEmailLoading}
+                className="flex items-center gap-2"
+              >
+                <Send className="h-4 w-4" />
+                {isEmailLoading ? 'Envoi...' : 'Tester Email'}
+              </Button>
+            </div>
+            
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 className="text-sm font-medium text-blue-800 mb-2">Configuration recommandée pour Gmail:</h4>
+              <ul className="text-xs text-blue-700 space-y-1">
+                <li>• Serveur SMTP: smtp.gmail.com</li>
+                <li>• Port: 587 (TLS) ou 465 (SSL)</li>
+                <li>• Utilisez un mot de passe d'application pour Gmail</li>
+                <li>• Activez l'authentification à 2 facteurs sur votre compte Gmail</li>
+              </ul>
+            </div>
           </CardContent>
         </Card>
     </DashboardLayout>
