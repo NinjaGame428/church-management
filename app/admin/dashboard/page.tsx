@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,13 +12,86 @@ import {
   CheckCircle,
   AlertCircle,
   UserPlus,
-  BarChart3
+  BarChart3,
+  RefreshCw
 } from "lucide-react";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import { useRouter } from "next/navigation";
 
+interface DashboardStats {
+  servicesThisMonth: number;
+  activeUsers: number;
+  scheduledServices: number;
+  participationRate: number;
+}
+
+interface RecentActivity {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  user: {
+    firstName: string;
+    lastName: string;
+  };
+  createdAt: string;
+}
+
+interface UpcomingService {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  status: string;
+  assignments: number;
+}
+
 export default function AdminDashboard() {
   const router = useRouter();
+  const [stats, setStats] = useState<DashboardStats>({
+    servicesThisMonth: 0,
+    activeUsers: 0,
+    scheduledServices: 0,
+    participationRate: 0
+  });
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [upcomingServices, setUpcomingServices] = useState<UpcomingService[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Load stats
+      const statsResponse = await fetch('/api/admin/dashboard/stats');
+      if (statsResponse.ok) {
+        const statsData = await statsResponse.json();
+        setStats(statsData);
+      }
+
+      // Load recent activity
+      const activityResponse = await fetch('/api/admin/dashboard/activity');
+      if (activityResponse.ok) {
+        const activityData = await activityResponse.json();
+        setRecentActivity(activityData);
+      }
+
+      // Load upcoming services
+      const servicesResponse = await fetch('/api/admin/dashboard/upcoming-services');
+      if (servicesResponse.ok) {
+        const servicesData = await servicesResponse.json();
+        setUpcomingServices(servicesData);
+      }
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleCreateService = () => {
     router.push('/admin/services');
@@ -50,8 +124,10 @@ export default function AdminDashboard() {
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">12</div>
-              <p className="text-xs text-muted-foreground">+2 depuis le mois dernier</p>
+              <div className="text-2xl font-bold">
+                {isLoading ? <RefreshCw className="h-6 w-6 animate-spin" /> : stats.servicesThisMonth}
+              </div>
+              <p className="text-xs text-muted-foreground">Services créés ce mois</p>
             </CardContent>
           </Card>
 
@@ -61,8 +137,10 @@ export default function AdminDashboard() {
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">45</div>
-              <p className="text-xs text-muted-foreground">+3 nouveaux cette semaine</p>
+              <div className="text-2xl font-bold">
+                {isLoading ? <RefreshCw className="h-6 w-6 animate-spin" /> : stats.activeUsers}
+              </div>
+              <p className="text-xs text-muted-foreground">Utilisateurs enregistrés</p>
             </CardContent>
           </Card>
 
@@ -72,7 +150,9 @@ export default function AdminDashboard() {
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">8</div>
+              <div className="text-2xl font-bold">
+                {isLoading ? <RefreshCw className="h-6 w-6 animate-spin" /> : stats.scheduledServices}
+              </div>
               <p className="text-xs text-muted-foreground">Prochaines 2 semaines</p>
             </CardContent>
           </Card>
@@ -83,8 +163,10 @@ export default function AdminDashboard() {
               <BarChart3 className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">94%</div>
-              <p className="text-xs text-muted-foreground">+5% depuis le mois dernier</p>
+              <div className="text-2xl font-bold">
+                {isLoading ? <RefreshCw className="h-6 w-6 animate-spin" /> : `${stats.participationRate}%`}
+              </div>
+              <p className="text-xs text-muted-foreground">Services confirmés</p>
             </CardContent>
           </Card>
         </div>
@@ -118,29 +200,41 @@ export default function AdminDashboard() {
               <CardDescription>Prochains services planifiés</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                  <div>
-                    <p className="font-medium">Dimanche 15 Octobre</p>
-                    <p className="text-sm text-gray-600">Service du matin - 10h00</p>
-                  </div>
-                  <Badge variant="secondary">Complet</Badge>
+              {isLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <RefreshCw className="h-6 w-6 animate-spin" />
                 </div>
-                <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
-                  <div>
-                    <p className="font-medium">Mercredi 18 Octobre</p>
-                    <p className="text-sm text-gray-600">Réunion de prière - 19h00</p>
-                  </div>
-                  <Badge variant="outline">En attente</Badge>
+              ) : upcomingServices.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Aucun service à venir</p>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                  <div>
-                    <p className="font-medium">Dimanche 22 Octobre</p>
-                    <p className="text-sm text-gray-600">Service du soir - 18h00</p>
-                  </div>
-                  <Badge className="bg-green-100 text-green-800">Confirmé</Badge>
+              ) : (
+                <div className="space-y-3">
+                  {upcomingServices.map((service) => (
+                    <div key={service.id} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                      <div>
+                        <p className="font-medium">{service.title}</p>
+                        <p className="text-sm text-gray-600">
+                          {new Date(service.date).toLocaleDateString('fr-FR')} - {service.time}
+                        </p>
+                        <p className="text-xs text-gray-500">{service.assignments} intervenant(s)</p>
+                      </div>
+                      <Badge 
+                        variant={service.status === 'PUBLISHED' ? 'default' : 'secondary'}
+                        className={
+                          service.status === 'PUBLISHED' ? 'bg-green-100 text-green-800' : 
+                          service.status === 'DRAFT' ? 'bg-yellow-100 text-yellow-800' : 
+                          'bg-gray-100 text-gray-800'
+                        }
+                      >
+                        {service.status === 'PUBLISHED' ? 'Publié' : 
+                         service.status === 'DRAFT' ? 'Brouillon' : service.status}
+                      </Badge>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -148,39 +242,66 @@ export default function AdminDashboard() {
         {/* Recent Activity */}
         <Card>
           <CardHeader>
-            <CardTitle>Activité récente</CardTitle>
-            <CardDescription>Dernières actions sur la plateforme</CardDescription>
+            <div className="flex justify-between items-center">
+              <div>
+                <CardTitle>Activité récente</CardTitle>
+                <CardDescription>Dernières actions sur la plateforme</CardDescription>
+              </div>
+              <Button variant="outline" size="sm" onClick={loadDashboardData}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Actualiser
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Service du dimanche confirmé</p>
-                  <p className="text-xs text-gray-500">Il y a 2 heures</p>
-                </div>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <RefreshCw className="h-6 w-6 animate-spin" />
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <UserPlus className="h-4 w-4 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Nouvel intervenant ajouté</p>
-                  <p className="text-xs text-gray-500">Il y a 4 heures</p>
-                </div>
+            ) : recentActivity.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <AlertCircle className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>Aucune activité récente</p>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
-                  <AlertCircle className="h-4 w-4 text-yellow-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">Rappel: Service de mercredi</p>
-                  <p className="text-xs text-gray-500">Il y a 6 heures</p>
-                </div>
+            ) : (
+              <div className="space-y-4">
+                {recentActivity.map((activity) => (
+                  <div key={activity.id} className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      activity.type === 'service_assignment' ? 'bg-green-100' :
+                      activity.type === 'service_confirmed' ? 'bg-blue-100' :
+                      activity.type === 'service_declined' ? 'bg-red-100' :
+                      activity.type === 'swap_request' ? 'bg-yellow-100' :
+                      activity.type === 'user_registered' ? 'bg-purple-100' :
+                      'bg-gray-100'
+                    }`}>
+                      {activity.type === 'service_assignment' ? (
+                        <Calendar className="h-4 w-4 text-green-600" />
+                      ) : activity.type === 'service_confirmed' ? (
+                        <CheckCircle className="h-4 w-4 text-blue-600" />
+                      ) : activity.type === 'service_declined' ? (
+                        <AlertCircle className="h-4 w-4 text-red-600" />
+                      ) : activity.type === 'swap_request' ? (
+                        <RefreshCw className="h-4 w-4 text-yellow-600" />
+                      ) : activity.type === 'user_registered' ? (
+                        <UserPlus className="h-4 w-4 text-purple-600" />
+                      ) : (
+                        <AlertCircle className="h-4 w-4 text-gray-600" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium">{activity.title}</p>
+                      <p className="text-xs text-gray-500">
+                        {activity.user.firstName} {activity.user.lastName} - {new Date(activity.createdAt).toLocaleString('fr-FR')}
+                      </p>
+                      {activity.message && (
+                        <p className="text-xs text-gray-600 mt-1">{activity.message}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
     </DashboardLayout>
