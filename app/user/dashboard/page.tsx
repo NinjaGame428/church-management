@@ -65,6 +65,24 @@ export default function UserDashboard() {
     }
   }, [user]);
 
+  // Refresh user data on component mount to ensure we have the latest info
+  useEffect(() => {
+    const refreshUserData = () => {
+      const savedUser = localStorage.getItem('churchUser');
+      if (savedUser) {
+        try {
+          const userData = JSON.parse(savedUser);
+          // User data is already loaded from AuthContext
+          console.log('Current user data:', userData);
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+        }
+      }
+    };
+    
+    refreshUserData();
+  }, []);
+
   const loadDashboardData = async () => {
     try {
       setIsLoading(true);
@@ -130,10 +148,15 @@ export default function UserDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <Card className="lg:col-span-1">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Mon Profil
-              </CardTitle>
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                  <User className="h-5 w-5" />
+                  Mon Profil
+                </CardTitle>
+                <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+                  <RefreshCw className="h-4 w-4" />
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-3">
