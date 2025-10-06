@@ -16,37 +16,8 @@ async function main() {
     }
   })
 
-  // Create demo admin user
-  const adminPassword = await bcrypt.hash('admin123', 12)
-  const admin = await prisma.user.upsert({
-    where: { email: 'admin@church.com' },
-    update: {},
-    create: {
-      email: 'admin@church.com',
-      password: adminPassword,
-      firstName: 'Administrateur',
-      lastName: 'Église',
-      phone: '+33 1 23 45 67 89',
-      role: 'ADMIN',
-      churchId: church.id
-    }
-  })
-
-  // Create demo user
-  const userPassword = await bcrypt.hash('user123', 12)
-  const user = await prisma.user.upsert({
-    where: { email: 'user@church.com' },
-    update: {},
-    create: {
-      email: 'user@church.com',
-      password: userPassword,
-      firstName: 'Jean',
-      lastName: 'Dupont',
-      phone: '+33 1 23 45 67 90',
-      role: 'USER',
-      churchId: church.id
-    }
-  })
+  // Demo users removed for production
+  // Create your own admin user through the registration process
 
   // Create demo services
   const nextSunday = new Date()
@@ -87,57 +58,8 @@ async function main() {
     }
   })
 
-  // Create service assignments
-  await prisma.serviceAssignment.upsert({
-    where: { 
-      serviceId_userId: {
-        serviceId: service1.id,
-        userId: user.id
-      }
-    },
-    update: {},
-    create: {
-      serviceId: service1.id,
-      userId: user.id,
-      role: 'Louange',
-      status: 'CONFIRMED'
-    }
-  })
-
-  await prisma.serviceAssignment.upsert({
-    where: { 
-      serviceId_userId: {
-        serviceId: service2.id,
-        userId: user.id
-      }
-    },
-    update: {},
-    create: {
-      serviceId: service2.id,
-      userId: user.id,
-      role: 'Son',
-      status: 'PENDING'
-    }
-  })
-
-  // Create availability
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-
-  await prisma.availability.upsert({
-    where: {
-      userId_date: {
-        userId: user.id,
-        date: today
-      }
-    },
-    update: {},
-    create: {
-      userId: user.id,
-      date: today,
-      status: 'AVAILABLE'
-    }
-  })
+  // Service assignments and availability removed for production
+  // These will be created when users register and are assigned to services
 
   // Create default service roles (commented out to avoid demo data)
   // Uncomment the following lines if you want to create default roles
@@ -172,8 +94,9 @@ async function main() {
   */
 
   console.log('✅ Database seeded successfully!')
-  console.log('👤 Admin user: admin@church.com / admin123')
-  console.log('👤 User: user@church.com / user123')
+  console.log('🏛️ Church created: Impact Centre Chrétien')
+  console.log('📅 Demo services created')
+  console.log('👤 Create your admin account through the registration process')
 }
 
 main()

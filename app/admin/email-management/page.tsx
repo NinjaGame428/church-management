@@ -5,10 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { 
   Mail, 
   Send,
@@ -16,7 +14,6 @@ import {
   Server,
   Bell,
   Save,
-  Settings,
   CheckCircle,
   XCircle,
   AlertCircle
@@ -145,7 +142,7 @@ export default function EmailManagement() {
         const errorData = await response.json();
         setError(`${errorData.error || 'Erreur lors de l\'envoi de l\'email de test'}${errorData.details ? ` - ${errorData.details}` : ''}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending test email:', error);
       setError('Erreur lors de l\'envoi de l\'email de test');
     } finally {

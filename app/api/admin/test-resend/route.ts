@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
 // POST - Test Resend connection
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     console.log('Testing Resend connection...');
     
