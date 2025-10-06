@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,6 @@ import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { 
   User, 
-  Mail, 
   Phone, 
   Bell, 
   Shield, 
@@ -67,6 +66,7 @@ export default function AdminSettings() {
     maintenanceMode: false
   });
 
+
   const handleProfileChange = (field: string, value: string) => {
     setProfileData(prev => ({ ...prev, [field]: value }));
   };
@@ -82,6 +82,7 @@ export default function AdminSettings() {
   const handleSystemChange = (field: string, checked: boolean) => {
     setSystemSettings(prev => ({ ...prev, [field]: checked }));
   };
+
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -214,6 +215,7 @@ export default function AdminSettings() {
       setIsLoading(false);
     }
   };
+
 
   return (
     <DashboardLayout 
@@ -460,6 +462,7 @@ export default function AdminSettings() {
             </form>
           </CardContent>
         </Card>
+
 
         {/* System Settings */}
         <Card>

@@ -21,7 +21,8 @@ import {
   Users,
   FileText,
   BarChart3,
-  RefreshCw
+  RefreshCw,
+  Mail
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNotifications } from "@/components/notifications/notification-provider";
@@ -130,6 +131,12 @@ const adminNavigationItems = [
     title: "Rapports",
     href: "/admin/reports",
     icon: BarChart3,
+    badge: null
+  },
+  {
+    title: "Gestion Email",
+    href: "/admin/email-management",
+    icon: Mail,
     badge: null
   },
   {

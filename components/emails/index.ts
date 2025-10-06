@@ -1,0 +1,16 @@
+export { BaseEmail } from './base-email';
+export { ServiceAssignedEmail } from './service-assigned';
+export { ServiceModifiedEmail } from './service-modified';
+export { ServiceCancelledEmail } from './service-cancelled';
+export { SchedulePublishedEmail } from './schedule-published';
+export { Reminder24hEmail } from './reminder-24h';
+export { IntervenantRemovedEmail } from './intervenant-removed';
+export { PasswordResetEmail } from './password-reset';
+export { EmailVerificationEmail } from './email-verification';
+export { SwapRequestReceivedEmail } from './swap-request-received';
+export { SwapAcceptedEmail } from './swap-accepted';
+export { SwapApprovedEmail } from './swap-approved';
+export { SwapRejectedEmail } from './swap-rejected';
+export { AvailabilityReminderEmail } from './availability-reminder';
+export { NewIntervenantRegisteredEmail } from './new-intervenant-registered';
+export { WelcomeNewIntervenantEmail } from './welcome-new-intervenant';

@@ -5,12 +5,15 @@ export async function GET() {
   try {
     // Load email settings from environment variables
     const settings = {
-      smtpHost: process.env.SMTP_HOST || '',
-      smtpPort: process.env.SMTP_PORT || '',
-      smtpUser: process.env.SMTP_USER || '',
-      smtpPass: process.env.SMTP_PASS ? '••••••••' : '', // Don't expose actual password
-      fromEmail: process.env.SMTP_USER || '',
-      fromName: process.env.FROM_NAME || 'Impact Centre Chrétien'
+      resendApiKey: process.env.RESEND_API_KEY ? '••••••••' : '', // Don't expose actual API key
+      fromEmail: process.env.FROM_EMAIL || '',
+      fromName: 'Impact Centre Chrétien',
+      replyTo: process.env.FROM_EMAIL || '',
+      enableEmailNotifications: true,
+      enableServiceReminders: true,
+      enableAvailabilityReminders: true,
+      enableSwapNotifications: true,
+      reminderTime: '24'
     };
 
     return NextResponse.json(settings);
@@ -27,34 +30,50 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { smtpHost, smtpPort, smtpUser, smtpPass, fromEmail, fromName } = body;
+    const { 
+      resendApiKey, 
+      fromEmail, 
+      fromName, 
+      replyTo,
+      enableEmailNotifications,
+      enableServiceReminders,
+      enableAvailabilityReminders,
+      enableSwapNotifications,
+      reminderTime
+    } = body;
 
     // Validate required fields
-    if (!smtpHost || !smtpPort || !smtpUser || !fromEmail) {
+    if (!fromEmail) {
       return NextResponse.json(
-        { error: 'Missing required email settings' },
+        { error: 'From email is required' },
         { status: 400 }
       );
     }
 
     // In a real application, you would save these to a database or secure storage
-    // For now, we'll just validate the settings
+    // For now, we'll just validate the settings and log them
     console.log('Email settings updated:', {
-      smtpHost,
-      smtpPort,
-      smtpUser,
       fromEmail,
-      fromName
+      fromName,
+      replyTo,
+      enableEmailNotifications,
+      enableServiceReminders,
+      enableAvailabilityReminders,
+      enableSwapNotifications,
+      reminderTime
     });
 
     return NextResponse.json({ 
       message: 'Email settings saved successfully',
       settings: {
-        smtpHost,
-        smtpPort,
-        smtpUser,
         fromEmail,
-        fromName
+        fromName,
+        replyTo,
+        enableEmailNotifications,
+        enableServiceReminders,
+        enableAvailabilityReminders,
+        enableSwapNotifications,
+        reminderTime
       }
     });
   } catch (error) {
