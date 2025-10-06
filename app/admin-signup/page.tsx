@@ -8,11 +8,14 @@ import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, Building, Phone } from "lucid
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default function AdminSignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useLanguage();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,19 +60,22 @@ export default function AdminSignupPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Back to home link */}
-        <Link 
-          href="/" 
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Retour à l'accueil
-        </Link>
+        <div className="flex items-center justify-between mb-6">
+          <Link 
+            href="/" 
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {t('common.back')}
+          </Link>
+          <LanguageSwitcher />
+        </div>
 
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl font-bold">Inscription Administrateur</CardTitle>
+            <CardTitle className="text-2xl font-bold">{t('auth.adminSignup')}</CardTitle>
             <CardDescription>
-              Créez un compte administrateur pour gérer votre église
+              {t('auth.createAccount')} {t('users.admin')}
             </CardDescription>
           </CardHeader>
           
@@ -77,10 +83,10 @@ export default function AdminSignupPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Admin Notice */}
               <div className="space-y-2">
-                <Label>Type de compte</Label>
+                <Label>{t('users.role')}</Label>
                 <div className="p-3 bg-red-50 border border-red-200 rounded-md">
                   <p className="text-sm text-red-800">
-                    <strong>Administrateur d'Église</strong> - Accès complet à la gestion des services
+                    <strong>{t('users.admin')}</strong> - {t('users.userManagement')}
                   </p>
                 </div>
               </div>
@@ -88,28 +94,28 @@ export default function AdminSignupPage() {
               {/* Personal Information */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">Prénom</Label>
+                  <Label htmlFor="firstName">{t('auth.firstName')}</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="firstName"
                       name="firstName"
                       type="text"
-                      placeholder="Jean"
+                      placeholder="John"
                       className="pl-10"
                       required
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Nom</Label>
+                  <Label htmlFor="lastName">{t('auth.lastName')}</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="lastName"
                       name="lastName"
                       type="text"
-                      placeholder="Dupont"
+                      placeholder="Doe"
                       className="pl-10"
                       required
                     />
@@ -120,14 +126,14 @@ export default function AdminSignupPage() {
 
               {/* Contact Information */}
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('auth.email')}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="votre@email.com"
+                    placeholder="your@email.com"
                     className="pl-10"
                     required
                   />
@@ -135,14 +141,14 @@ export default function AdminSignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Téléphone</Label>
+                <Label htmlFor="phone">{t('auth.phone')}</Label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="phone"
                     name="phone"
                     type="tel"
-                    placeholder="+33 1 23 45 67 89"
+                    placeholder="+1 234 567 8900"
                     className="pl-10"
                   />
                 </div>
@@ -150,7 +156,7 @@ export default function AdminSignupPage() {
 
               {/* Password */}
               <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe</Label>
+                <Label htmlFor="password">{t('auth.password')}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -178,7 +184,7 @@ export default function AdminSignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -210,21 +216,21 @@ export default function AdminSignupPage() {
                 className="w-full" 
                 disabled={isLoading}
               >
-                {isLoading ? "Création du compte..." : "Créer le compte administrateur"}
+                {isLoading ? t('common.loading') : t('auth.createAccount')}
               </Button>
             </form>
 
             <div className="mt-6 text-center text-sm">
               <p className="text-muted-foreground">
-                Déjà un compte ?{" "}
+                {t('auth.alreadyHaveAccount')}{" "}
                 <Link href="/login" className="text-primary hover:underline">
-                  Se connecter
+                  {t('auth.login')}
                 </Link>
               </p>
               <p className="text-muted-foreground mt-2">
-                Inscription pour intervenants ?{" "}
+                {t('auth.userSignup')}{" "}
                 <Link href="/signup" className="text-primary hover:underline">
-                  Inscription Intervenant
+                  {t('auth.userSignup')}
                 </Link>
               </p>
             </div>

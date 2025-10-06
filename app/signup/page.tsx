@@ -10,12 +10,15 @@ import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, Building, Phone } from "lucid
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   // All users are USER by default - no role selection needed
+  const { t } = useLanguage();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,13 +63,16 @@ export default function SignupPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Back to home link */}
-        <Link 
-          href="/" 
-          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Retour à l'accueil
-        </Link>
+        <div className="flex items-center justify-between mb-6">
+          <Link 
+            href="/" 
+            className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {t('common.back')}
+          </Link>
+          <LanguageSwitcher />
+        </div>
 
         <Card className="shadow-lg">
           <CardHeader className="text-center">
@@ -85,9 +91,9 @@ export default function SignupPage() {
                 />
               </svg>
             </div>
-            <CardTitle className="text-2xl">Créer un compte</CardTitle>
+            <CardTitle className="text-2xl">{t('auth.createAccount')}</CardTitle>
             <CardDescription>
-              Rejoignez ChurchManager et simplifiez la gestion de vos services
+              {t('dashboard.welcome')} ChurchManager
             </CardDescription>
           </CardHeader>
           
@@ -95,10 +101,10 @@ export default function SignupPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* User Type Selection */}
               <div className="space-y-2">
-                <Label>Type de compte</Label>
+                <Label>{t('users.role')}</Label>
                 <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
                   <p className="text-sm text-blue-800">
-                    <strong>Intervenant</strong> - Vous serez enregistré comme participant aux services
+                    <strong>{t('users.user')}</strong> - {t('auth.userSignup')}
                   </p>
                 </div>
               </div>
@@ -106,28 +112,28 @@ export default function SignupPage() {
               {/* Personal Information */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">Prénom</Label>
+                  <Label htmlFor="firstName">{t('auth.firstName')}</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="firstName"
                       name="firstName"
                       type="text"
-                      placeholder="Jean"
+                      placeholder="John"
                       className="pl-10"
                       required
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Nom</Label>
+                  <Label htmlFor="lastName">{t('auth.lastName')}</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
                       id="lastName"
                       name="lastName"
                       type="text"
-                      placeholder="Dupont"
+                      placeholder="Doe"
                       className="pl-10"
                       required
                     />
@@ -139,14 +145,14 @@ export default function SignupPage() {
 
               {/* Contact Information */}
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('auth.email')}</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
                     name="email"
                     type="email"
-                    placeholder="votre@email.com"
+                    placeholder="your@email.com"
                     className="pl-10"
                     required
                   />
@@ -154,14 +160,14 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Téléphone</Label>
+                <Label htmlFor="phone">{t('auth.phone')}</Label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="phone"
                     name="phone"
                     type="tel"
-                    placeholder="+33 1 23 45 67 89"
+                    placeholder="+1 234 567 8900"
                     className="pl-10"
                   />
                 </div>
@@ -169,7 +175,7 @@ export default function SignupPage() {
 
               {/* Password */}
               <div className="space-y-2">
-                <Label htmlFor="password">Mot de passe</Label>
+                <Label htmlFor="password">{t('auth.password')}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -197,7 +203,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -245,7 +251,7 @@ export default function SignupPage() {
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Création du compte..." : "Créer mon compte"}
+                {isLoading ? t('common.loading') : t('auth.createAccount')}
               </Button>
             </form>
 
@@ -253,15 +259,15 @@ export default function SignupPage() {
 
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                Déjà un compte ?{" "}
+                {t('auth.alreadyHaveAccount')}{" "}
                 <Link href="/login" className="text-primary hover:underline">
-                  Se connecter
+                  {t('auth.login')}
                 </Link>
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                Inscription pour administrateur d'église ?{" "}
+                {t('auth.adminSignup')}{" "}
                 <Link href="/admin-signup" className="text-primary hover:underline">
-                  Inscription Admin
+                  {t('auth.adminSignup')}
                 </Link>
               </p>
             </div>
