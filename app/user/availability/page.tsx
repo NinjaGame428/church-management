@@ -8,7 +8,6 @@ import {
   Calendar, 
   Clock, 
   User, 
-  RefreshCw, 
   CheckCircle, 
   XCircle, 
   AlertCircle,
@@ -34,22 +33,11 @@ interface Availability {
   serviceTitle?: string;
 }
 
-interface SwapRequest {
-  id: string;
-  fromUser: string;
-  toUser: string;
-  serviceId: string;
-  serviceTitle: string;
-  date: string;
-  status: 'pending' | 'accepted' | 'rejected' | 'admin_approved' | 'admin_rejected';
-  message?: string;
-}
 
 export default function AvailabilityPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const [availabilities, setAvailabilities] = useState<Availability[]>([]);
-  const [swapRequests, setSwapRequests] = useState<SwapRequest[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -61,11 +49,10 @@ export default function AvailabilityPage() {
     }
   }, [user, isLoading, router]);
 
-  // Load availabilities and swap requests
+  // Load availabilities
   useEffect(() => {
     if (user) {
       loadAvailabilities();
-      loadSwapRequests();
     }
   }, [user]);
 
@@ -88,17 +75,6 @@ export default function AvailabilityPage() {
     }
   };
 
-  const loadSwapRequests = async () => {
-    try {
-      const response = await fetch('/api/user/swap-requests');
-      if (response.ok) {
-        const data = await response.json();
-        setSwapRequests(data);
-      }
-    } catch (error) {
-      console.error('Error loading swap requests:', error);
-    }
-  };
 
   const handleAddAvailability = async (data: {
     date: string;
@@ -194,57 +170,6 @@ export default function AvailabilityPage() {
     }
   };
 
-  const handleSwapRequest = async (availability: Availability) => {
-    if (!confirm('Voulez-vous demander un échange pour cette disponibilité?')) return;
-
-    try {
-      const response = await fetch('/api/user/swap-requests', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fromUserId: user?.id,
-          serviceId: availability.serviceId,
-          date: availability.date,
-          message: 'Demande d\'échange de service'
-        }),
-      });
-
-      if (response.ok) {
-        setMessage('Demande d\'échange envoyée!');
-        loadSwapRequests();
-      } else {
-        setError('Erreur lors de l\'envoi de la demande');
-      }
-    } catch (error) {
-      console.error('Swap request error:', error);
-      setError('Erreur lors de l\'envoi de la demande');
-    }
-  };
-
-  const handleSwapResponse = async (requestId: string, response: 'accepted' | 'rejected') => {
-    try {
-      const res = await fetch(`/api/user/swap-requests/${requestId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: response }),
-      });
-
-      if (res.ok) {
-        setMessage(`Demande d'échange ${response === 'accepted' ? 'acceptée' : 'rejetée'}!`);
-        loadSwapRequests();
-        loadAvailabilities();
-      } else {
-        setError('Erreur lors de la réponse');
-      }
-    } catch (error) {
-      console.error('Swap response error:', error);
-      setError('Erreur lors de la réponse');
-    }
-  };
 
   if (isLoading) {
     return (
@@ -278,9 +203,9 @@ export default function AvailabilityPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6">
           {/* Calendar View */}
-          <div className="lg:col-span-2">
+          <div>
             {isLoadingData ? (
               <Card>
                 <CardContent className="p-8">
@@ -298,95 +223,6 @@ export default function AvailabilityPage() {
                 onDeleteAvailability={handleDelete}
               />
             )}
-          </div>
-
-          {/* Swap Requests */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <RefreshCw className="h-5 w-5" />
-                      Demandes d'Échange
-                    </CardTitle>
-                    <CardDescription>
-                      Gérez vos demandes d'échange de services
-                    </CardDescription>
-                  </div>
-                  <Button asChild>
-                    <Link href="/user/swap">
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Nouvelle Demande
-                    </Link>
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {swapRequests.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <RefreshCw className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>Aucune demande d'échange</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {swapRequests.map((request) => (
-                      <div key={request.id} className="p-4 border rounded-lg">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge 
-                                variant={request.status === 'pending' ? 'secondary' :
-                                        request.status === 'accepted' ? 'default' : 
-                                        request.status === 'admin_approved' ? 'default' :
-                                        request.status === 'admin_rejected' ? 'destructive' : 'destructive'}
-                              >
-                                {request.status === 'pending' ? 'En attente' :
-                                 request.status === 'accepted' ? 'Acceptée - En attente admin' :
-                                 request.status === 'admin_approved' ? 'Approuvée par admin' :
-                                 request.status === 'admin_rejected' ? 'Rejetée par admin' : 'Rejetée'}
-                              </Badge>
-                            </div>
-                            <p className="font-medium">{request.serviceTitle}</p>
-                            <p className="text-sm text-muted-foreground">
-                              {new Date(request.date).toLocaleDateString('fr-FR')}
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {request.fromUserId === user?.id ? 
-                                `Vers: ${request.toUser.firstName} ${request.toUser.lastName}` :
-                                `De: ${request.fromUser.firstName} ${request.fromUser.lastName}`
-                              }
-                            </p>
-                            {request.message && (
-                              <p className="text-sm text-muted-foreground mt-1">{request.message}</p>
-                            )}
-                          </div>
-                          {request.status === 'pending' && request.fromUserId !== user?.id && (
-                            <div className="flex gap-2">
-                              <Button 
-                                size="sm" 
-                                onClick={() => handleSwapResponse(request.id, 'accepted')}
-                              >
-                                <CheckCircle className="h-4 w-4 mr-1" />
-                                Accepter
-                              </Button>
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                onClick={() => handleSwapResponse(request.id, 'rejected')}
-                              >
-                                <XCircle className="h-4 w-4 mr-1" />
-                                Rejeter
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
           </div>
         </div>
     </DashboardLayout>
