@@ -1,5 +1,3 @@
-'use client';
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,11 +13,8 @@ import {
   Smartphone
 } from "lucide-react";
 import React from "react";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 const DashboardPreview = () => {
-  const { t } = useLanguage();
-  
   return (
     <div id="dashboards" className="w-full py-8 sm:py-12 lg:py-20 px-4 sm:px-6 bg-muted/30">
       <div className="max-w-6xl mx-auto">

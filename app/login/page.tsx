@@ -9,15 +9,12 @@ import { ArrowLeft, Eye, EyeOff, Mail, Lock } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useRouter } from "next/navigation";
-import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { login, user, isLoading } = useAuth();
-  const { t } = useLanguage();
   const router = useRouter();
 
   // Redirect if already logged in
@@ -47,7 +44,7 @@ export default function LoginPage() {
       // Redirect will happen automatically via useEffect
     } else {
       console.log('Login failed');
-      setError(t('auth.invalidCredentials'));
+      setError('Email ou mot de passe incorrect');
     }
   };
 
@@ -61,9 +58,8 @@ export default function LoginPage() {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
-            {t('common.back')}
+            Retour à l'accueil
           </Link>
-          <LanguageSwitcher />
         </div>
 
         <Card className="shadow-lg">
@@ -83,9 +79,9 @@ export default function LoginPage() {
                 />
               </svg>
             </div>
-            <CardTitle className="text-2xl">{t('auth.login')}</CardTitle>
+            <CardTitle className="text-2xl">Connexion</CardTitle>
             <CardDescription>
-              {t('dashboard.welcome')} ChurchManager
+              Bienvenue sur ChurchManager
             </CardDescription>
           </CardHeader>
           
@@ -97,7 +93,7 @@ export default function LoginPage() {
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">{t('auth.email')}</Label>
+                <Label htmlFor="email">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -112,7 +108,7 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">{t('auth.password')}</Label>
+                <Label htmlFor="password">Mot de passe</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -147,19 +143,19 @@ export default function LoginPage() {
                     className="rounded border-gray-300"
                   />
                   <Label htmlFor="remember" className="text-sm">
-                    {t('auth.rememberMe')}
+                    Se souvenir de moi
                   </Label>
                 </div>
                 <Link
                   href="/forgot-password"
                   className="text-sm text-primary hover:underline"
                 >
-                  {t('auth.forgotPassword')}
+                  Mot de passe oublié ?
                 </Link>
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? t('common.loading') : t('auth.login')}
+                {isLoading ? 'Chargement...' : 'Connexion'}
               </Button>
             </form>
 
@@ -167,9 +163,9 @@ export default function LoginPage() {
 
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                {t('auth.dontHaveAccount')}{" "}
+                Pas encore de compte ?{" "}
                 <Link href="/signup" className="text-primary hover:underline">
-                  {t('auth.createAccount')}
+                  Créer un compte
                 </Link>
               </p>
             </div>

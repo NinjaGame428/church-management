@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Geist } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { LanguageProvider } from "@/contexts/LanguageContext";
 import { NotificationProvider } from "@/components/notifications/notification-provider";
 import { Toaster } from "@/components/ui/toaster";
 import "./globals.css";
@@ -101,21 +100,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <LanguageProvider>
-            <AuthProvider>
-              <NotificationProvider>
-                <TooltipProvider>
-                  {children}
-                  <Toaster />
-                </TooltipProvider>
-              </NotificationProvider>
-            </AuthProvider>
-          </LanguageProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+        <html lang="fr" suppressHydrationWarning>
+          <body className={`${geistSans.className} antialiased`}>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+              <AuthProvider>
+                <NotificationProvider>
+                  <TooltipProvider>
+                    {children}
+                    <Toaster />
+                  </TooltipProvider>
+                </NotificationProvider>
+              </AuthProvider>
+            </ThemeProvider>
+          </body>
+        </html>
   );
 }

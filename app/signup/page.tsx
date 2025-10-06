@@ -10,15 +10,12 @@ import { ArrowLeft, Eye, EyeOff, Mail, Lock, User, Building, Phone } from "lucid
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { LanguageSwitcher } from "@/components/language-switcher";
 
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   // All users are USER by default - no role selection needed
-  const { t } = useLanguage();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,9 +66,8 @@ export default function SignupPage() {
             className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
           >
             <ArrowLeft className="h-4 w-4" />
-            {t('common.back')}
+            Retour à l'accueil
           </Link>
-          <LanguageSwitcher />
         </div>
 
         <Card className="shadow-lg">
@@ -91,9 +87,9 @@ export default function SignupPage() {
                 />
               </svg>
             </div>
-            <CardTitle className="text-2xl">{t('auth.createAccount')}</CardTitle>
+            <CardTitle className="text-2xl">Créer un compte</CardTitle>
             <CardDescription>
-              {t('dashboard.welcome')} ChurchManager
+              Bienvenue sur ChurchManager
             </CardDescription>
           </CardHeader>
           
@@ -101,10 +97,10 @@ export default function SignupPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* User Type Selection */}
               <div className="space-y-2">
-                <Label>{t('users.role')}</Label>
+                <Label>Type de compte</Label>
                 <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
                   <p className="text-sm text-blue-800">
-                    <strong>{t('users.user')}</strong> - {t('auth.userSignup')}
+                    <strong>Intervenant</strong> - Vous serez enregistré comme participant aux services
                   </p>
                 </div>
               </div>
@@ -112,7 +108,7 @@ export default function SignupPage() {
               {/* Personal Information */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">{t('auth.firstName')}</Label>
+                  <Label htmlFor="firstName">Prénom</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -126,7 +122,7 @@ export default function SignupPage() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">{t('auth.lastName')}</Label>
+                  <Label htmlFor="lastName">Nom</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -145,7 +141,7 @@ export default function SignupPage() {
 
               {/* Contact Information */}
               <div className="space-y-2">
-                <Label htmlFor="email">{t('auth.email')}</Label>
+                <Label htmlFor="email">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -160,7 +156,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">{t('auth.phone')}</Label>
+                <Label htmlFor="phone">Téléphone</Label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -175,7 +171,7 @@ export default function SignupPage() {
 
               {/* Password */}
               <div className="space-y-2">
-                <Label htmlFor="password">{t('auth.password')}</Label>
+                <Label htmlFor="password">Mot de passe</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -203,7 +199,7 @@ export default function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
+                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
@@ -251,7 +247,7 @@ export default function SignupPage() {
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? t('common.loading') : t('auth.createAccount')}
+                {isLoading ? 'Chargement...' : 'Créer un compte'}
               </Button>
             </form>
 
@@ -259,15 +255,15 @@ export default function SignupPage() {
 
             <div className="text-center">
               <p className="text-sm text-muted-foreground">
-                {t('auth.alreadyHaveAccount')}{" "}
+                Déjà un compte ?{" "}
                 <Link href="/login" className="text-primary hover:underline">
-                  {t('auth.login')}
+                  Connexion
                 </Link>
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                {t('auth.adminSignup')}{" "}
+                Inscription pour administrateur d'église ?{" "}
                 <Link href="/admin-signup" className="text-primary hover:underline">
-                  {t('auth.adminSignup')}
+                  Inscription Administrateur
                 </Link>
               </p>
             </div>

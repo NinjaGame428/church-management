@@ -1,5 +1,3 @@
-'use client';
-
 import {
   Calendar,
   Users,
@@ -11,7 +9,6 @@ import {
   Smartphone,
 } from "lucide-react";
 import React from "react";
-import { useLanguage } from "@/contexts/LanguageContext";
 
 const features = [
   {
@@ -73,8 +70,6 @@ const features = [
 ];
 
 const Features = () => {
-  const { t } = useLanguage();
-  
   return (
     <div id="features" className="w-full py-8 sm:py-12 lg:py-20 px-4 sm:px-6">
       <div className="text-center mb-12 sm:mb-16">
