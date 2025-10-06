@@ -14,6 +14,7 @@ import {
   User,
   Trash2
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import DashboardLayout from "@/components/layout/dashboard-layout";
 import { useNotifications } from "@/components/notifications/notification-provider";
 
@@ -68,17 +69,36 @@ export default function UserNotifications() {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
     
-    if (diffInHours < 1) {
-      return 'À l\'instant';
-    } else if (diffInHours < 24) {
-      return `Il y a ${diffInHours}h`;
-    } else if (diffInHours < 48) {
-      return 'Hier';
+    // Show exact date and time for all notifications
+    const formattedDate = date.toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    const formattedTime = date.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+    
+    // Add relative time for context
+    let relativeTime = '';
+    if (diffInMinutes < 1) {
+      relativeTime = ' (à l\'instant)';
+    } else if (diffInMinutes < 60) {
+      relativeTime = ` (il y a ${diffInMinutes} min)`;
+    } else if (diffInMinutes < 1440) { // Less than 24 hours
+      const hours = Math.floor(diffInMinutes / 60);
+      relativeTime = ` (il y a ${hours}h)`;
     } else {
-      return date.toLocaleDateString('fr-FR');
+      const days = Math.floor(diffInMinutes / 1440);
+      relativeTime = ` (il y a ${days} jour${days > 1 ? 's' : ''})`;
     }
+    
+    return `${formattedDate} à ${formattedTime}${relativeTime}`;
   };
 
   return (
@@ -151,7 +171,24 @@ export default function UserNotifications() {
                           </p>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             <Clock className="h-3 w-3" />
-                            {formatDate(notification.createdAt)}
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <span className="font-mono cursor-help">{formatDate(notification.createdAt)}</span>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Notification envoyée le {new Date(notification.createdAt).toLocaleString('fr-FR', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    second: '2-digit'
+                                  })}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
                           </div>
                         </div>
                         
